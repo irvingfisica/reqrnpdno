@@ -1,5 +1,5 @@
-use reqrnpdno::urls;
 use reqrnpdno::cliente;
+use reqrnpdno::parameters;
 
 use std::error::Error;
 
@@ -9,19 +9,13 @@ fn main () {
 
 fn run() -> Result<(), Box<dyn Error>> {
 
-    let edourl = urls::estados_url();
-    let munurl = urls::municipios_url();
-
     let cliente = cliente::cliente_nuevo()?;
 
-    let edo_resp = cliente.post(edourl).send()?;
+    let estados = parameters::get_estados(&cliente)?;
+    println!("{:?}",estados);
 
-    println!("Respuesta: {:?}", edo_resp.text()?);
+    let municipios = parameters::get_municipios(&cliente, "20")?;
+    println!("{:?}",municipios);
 
-    let params = [("idEstado", "33")];
-    let mun_resp = cliente.post(munurl).form(&params).send()?;
-
-    println!("Respuesta: {:?}", mun_resp.text()?);
-    
     Ok(())
 }
