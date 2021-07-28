@@ -14,7 +14,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     let estados = parameters::get_estados(&cliente)?;
     println!("{:?}",estados);
 
-    let municipios = parameters::get_municipios(&cliente, "9")?;
+    let municipios = parameters::get_municipios(&cliente, "1")?;
     println!("{:?}",municipios);
 
     let colonias = parameters::get_colonias(&cliente, "1", "1")?;
