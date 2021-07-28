@@ -46,6 +46,27 @@ pub fn get_municipios(cliente: &Client, estado: &str) -> Result<BTreeMap<String,
     Ok(mapa)
 }
 
+pub fn get_colonias(cliente: &Client, estado: &str, municipio: &str) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let colurl = urls::colonias_url();
+
+    let params = [("idEstado", estado),("idMunicipio", municipio)];
+    let col_resp = cliente.post(colurl).form(&params).send()?;
+
+    let colonias: Vec<OptionSelect> = col_resp.json()?;
+
+    colonias.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct OptionSelect {
