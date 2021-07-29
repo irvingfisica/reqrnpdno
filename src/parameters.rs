@@ -4,6 +4,7 @@ use serde::{Deserialize};
 use reqwest::blocking::Client;
 use crate::urls;
 
+#[derive(Debug)]
 pub struct Parametros {
     pub titulo: String,
     pub id_estatus_victima: String,

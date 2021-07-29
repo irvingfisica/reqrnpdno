@@ -62,3 +62,7 @@ pub fn emigratorio_url() -> String {
     mix_urls(&url_base(), "Catalogo/EstatusMigratorio")
 }
 
+pub fn totales_url() -> String {
+    mix_urls(&url_base(), "Sociodemografico/Totales")
+}
+

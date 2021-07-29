@@ -1,5 +1,7 @@
 use reqrnpdno::cliente;
 use reqrnpdno::parameters;
+use reqrnpdno::extractora;
+use parameters::Parametros;
 
 use std::error::Error;
 
@@ -9,7 +11,7 @@ fn main () {
 
 fn run() -> Result<(), Box<dyn Error>> {
 
-    let cliente = cliente::cliente_nuevo()?;
+    let mut cliente = cliente::cliente_nuevo()?;
 
     let estados = parameters::get_estados(&cliente)?;
     println!("Estados: {:?}",estados);
@@ -49,6 +51,18 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     let emigratorios = parameters::get_emigratorios(&cliente)?;
     println!("Estatus migratorios: {:?}",emigratorios);
+
+    let parametros = Parametros::new();
+
+    let totales = match extractora::totales(&cliente, &parametros) {
+        Ok(datos) => datos,
+        Err(_) => {
+            println!("Es necesario un nuevo cliente");
+            cliente = cliente::cliente_nuevo()?;
+            extractora::totales(&cliente, &parametros).unwrap()
+        }
+    };
+    println!("Totales: {:?}",totales);
 
     Ok(())
 }
