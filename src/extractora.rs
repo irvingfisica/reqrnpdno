@@ -38,6 +38,23 @@ pub struct Data {
     pub x_axis_categories: Vec<String>
 }
 
+impl Data {
+    pub fn to_map(&self) -> BTreeMap<String,BTreeMap<String,u32>> {
+        let mut mapa = BTreeMap::new();
+
+        for serie in self.series.iter() {
+            let llave = serie.name.clone();
+            let mut minimapa: BTreeMap<String, u32> = BTreeMap::new();
+            for (catego,valor) in self.x_axis_categories.iter().zip(serie.data.iter()) {
+                minimapa.insert(catego.clone(),valor.clone());
+            };
+            mapa.insert(llave,minimapa);
+        };
+
+        mapa
+    }
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Serie {
     pub name: String,
