@@ -66,3 +66,7 @@ pub fn totales_url() -> String {
     mix_urls(&url_base(), "Sociodemografico/Totales")
 }
 
+pub fn por_estado_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartSexoEstados")
+}
+

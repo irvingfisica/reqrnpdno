@@ -64,5 +64,8 @@ fn run() -> Result<(), Box<dyn Error>> {
     };
     println!("Totales: {:?}",totales);
 
+    let estatales = extractora::por_estado(&cliente, &parametros)?;
+    println!("Estatales: {:?}",estatales);
+
     Ok(())
 }
