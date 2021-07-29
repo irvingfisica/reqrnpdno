@@ -64,14 +64,8 @@ fn run() -> Result<(), Box<dyn Error>> {
     };
     println!("Totales: {:?}",totales);
 
-    let estatales = extractora::por_estado(&cliente, &parametros)?;
-    println!("Estatales: {:?}",estatales.to_map());
-
-    let municipales = extractora::por_municipio(&cliente, &parametros)?;
-    println!("Municipales: {:?}",municipales.to_map());
-
-    let coloniales = extractora::por_colonia(&cliente, &parametros)?;
-    println!("Coloniales: {:?}",coloniales.to_map());
+    let edades = extractora::por_edades_completo(&cliente, &parametros)?;
+    println!("Edades: {:?}",edades.to_map());
 
     Ok(())
 }

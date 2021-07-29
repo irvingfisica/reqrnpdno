@@ -106,3 +106,7 @@ pub fn portal_url() -> String {
     mix_urls(&url_base(), "SocioDemografico/BarChartFoliosPortal")
 }
 
+pub fn tabla_detalle_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/TablaDetalle")
+}
+
