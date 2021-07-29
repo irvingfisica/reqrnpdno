@@ -21,3 +21,44 @@ pub fn municipios_url() -> String {
 pub fn colonias_url() -> String {
     mix_urls(&url_base(), "Catalogo/Colonias")
 }
+
+pub fn nacionalidades_url() -> String {
+    mix_urls(&url_base(), "Catalogo/Nacionalidades")
+}
+
+pub fn hipotesis_url() -> String {
+    mix_urls(&url_base(), "Catalogo/Hipotesis")
+}
+
+pub fn delitos_url() -> String {
+    mix_urls(&url_base(), "Catalogo/Delito")
+}
+
+pub fn medios_url() -> String {
+    mix_urls(&url_base(), "Catalogo/MediosConocimiento")
+}
+
+pub fn circunstancias_url() -> String {
+    mix_urls(&url_base(), "Catalogo/Circunstancias")
+}
+
+pub fn discapacidades_url() -> String {
+    mix_urls(&url_base(), "Catalogo/TiposDiscapacidad")
+}
+
+pub fn etnias_url() -> String {
+    mix_urls(&url_base(), "Catalogo/Etnias")
+}
+
+pub fn lenguas_url() -> String {
+    mix_urls(&url_base(), "Catalogo/Lenguas")
+}
+
+pub fn religiones_url() -> String {
+    mix_urls(&url_base(), "Catalogo/Religiones")
+}
+
+pub fn emigratorio_url() -> String {
+    mix_urls(&url_base(), "Catalogo/EstatusMigratorio")
+}
+

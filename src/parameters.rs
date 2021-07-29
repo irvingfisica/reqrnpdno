@@ -171,6 +171,216 @@ pub fn get_colonias(cliente: &Client, estado: &str, municipio: &str) -> Result<B
     Ok(mapa)
 }
 
+pub fn get_nacionalidades(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let nacurl = urls::nacionalidades_url();
+
+    let nac_resp = cliente.post(nacurl).send()?;
+
+    let nacionalidades: Vec<OptionSelect> = nac_resp.json()?;
+
+    nacionalidades.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_hipotesis(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let hipurl = urls::hipotesis_url();
+
+    let hip_resp = cliente.post(hipurl).send()?;
+
+    let hipotesis: Vec<OptionSelect> = hip_resp.json()?;
+
+    hipotesis.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_delitos(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let delurl = urls::delitos_url();
+
+    let del_resp = cliente.post(delurl).send()?;
+
+    let delitos: Vec<OptionSelect> = del_resp.json()?;
+
+    delitos.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_medios(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let medurl = urls::medios_url();
+
+    let med_resp = cliente.post(medurl).send()?;
+
+    let medios: Vec<OptionSelect> = med_resp.json()?;
+
+    medios.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_circunstancias(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let cirurl = urls::circunstancias_url();
+
+    let cir_resp = cliente.post(cirurl).send()?;
+
+    let circunstancias: Vec<OptionSelect> = cir_resp.json()?;
+
+    circunstancias.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_discapacidades(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let disurl = urls::discapacidades_url();
+
+    let dis_resp = cliente.post(disurl).send()?;
+
+    let discapacidades: Vec<OptionSelect> = dis_resp.json()?;
+
+    discapacidades.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_etnias(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let etnurl = urls::etnias_url();
+
+    let etn_resp = cliente.post(etnurl).send()?;
+
+    let etnias: Vec<OptionSelect> = etn_resp.json()?;
+
+    etnias.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_lenguas(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let lenurl = urls::lenguas_url();
+
+    let len_resp = cliente.post(lenurl).send()?;
+
+    let lenguas: Vec<OptionSelect> = len_resp.json()?;
+
+    lenguas.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_religiones(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let relurl = urls::religiones_url();
+
+    let rel_resp = cliente.post(relurl).send()?;
+
+    let religiones: Vec<OptionSelect> = rel_resp.json()?;
+
+    religiones.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
+pub fn get_emigratorios(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+    let emiurl = urls::emigratorio_url();
+
+    let emi_resp = cliente.post(emiurl).send()?;
+
+    let estatus: Vec<OptionSelect> = emi_resp.json()?;
+
+    estatus.iter().for_each(|opcion| {
+        mapa.insert(opcion.text.to_string(),opcion.value.to_string());
+    });
+
+    if mapa.is_empty() {
+        return Err(From::from("No se obtuvieron datos"));
+    };
+
+    Ok(mapa)
+    
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct OptionSelect {
