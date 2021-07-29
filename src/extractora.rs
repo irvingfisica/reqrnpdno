@@ -31,6 +31,105 @@ pub fn por_estado(cliente: &Client, parametros: &Parametros) -> Result<Data, Box
     Ok(datos)
 }
 
+pub fn por_municipio(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::por_municipio_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn por_colonia(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::por_colonia_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn por_anio(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::por_anio_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn por_mes(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::ultimo_anio_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn por_rango_edad(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::rango_edad_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn por_nacionalidad(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::nacionalidad_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn fiscalias(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::fiscalias_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn comisiones(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::comisiones_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
+pub fn portal(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::portal_url();
+    let params = parametros.to_tuples();
+
+    let response = cliente.post(url).form(&params).send()?;
+    let datos: Data = response.json()?;
+
+    Ok(datos)
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct Data {

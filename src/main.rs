@@ -67,5 +67,11 @@ fn run() -> Result<(), Box<dyn Error>> {
     let estatales = extractora::por_estado(&cliente, &parametros)?;
     println!("Estatales: {:?}",estatales.to_map());
 
+    let municipales = extractora::por_municipio(&cliente, &parametros)?;
+    println!("Municipales: {:?}",municipales.to_map());
+
+    let coloniales = extractora::por_colonia(&cliente, &parametros)?;
+    println!("Coloniales: {:?}",coloniales.to_map());
+
     Ok(())
 }

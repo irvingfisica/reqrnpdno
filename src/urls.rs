@@ -70,3 +70,39 @@ pub fn por_estado_url() -> String {
     mix_urls(&url_base(), "SocioDemografico/BarChartSexoEstados")
 }
 
+pub fn por_municipio_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartSexoMunicipio")
+}
+
+pub fn por_colonia_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartSexoColonia")
+}
+
+pub fn por_anio_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/AreaChartSexoAnio")
+}
+
+pub fn ultimo_anio_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartSexoAnioMeses")
+}
+
+pub fn rango_edad_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/AreaChartSexoRango")
+}
+
+pub fn nacionalidad_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartSexoNacionalidad")
+}
+
+pub fn fiscalias_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartFoliosIniciadosActualizadosFiscalias")
+}
+
+pub fn comisiones_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartFoliosIniciadosActualizadosComisiones")
+}
+
+pub fn portal_url() -> String {
+    mix_urls(&url_base(), "SocioDemografico/BarChartFoliosPortal")
+}
+
