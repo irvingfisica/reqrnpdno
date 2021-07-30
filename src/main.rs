@@ -16,43 +16,12 @@ fn run() -> Result<(), Box<dyn Error>> {
     let estados = parameters::get_estados(&cliente)?;
     println!("Estados: {:?}",estados);
 
-    let municipios = parameters::get_municipios(&cliente, "1")?;
+    let municipios = parameters::get_municipios(&cliente, "9")?;
     println!("Municipios: {:?}",municipios);
 
-    let colonias = parameters::get_colonias(&cliente, "1", "1")?;
-    println!("Colonias: {:?}",colonias);
-
-    let nacionalidades = parameters::get_nacionalidades(&cliente)?;
-    println!("Nacionalidades: {:?}",nacionalidades);
-
-    let hipotesis = parameters::get_hipotesis(&cliente)?;
-    println!("Hipotesis: {:?}",hipotesis);
-
-    let delitos = parameters::get_delitos(&cliente)?;
-    println!("Delitos: {:?}",delitos);
-
-    let medios = parameters::get_medios(&cliente)?;
-    println!("Medios de conocimiento: {:?}",medios);
-
-    let circunstancias = parameters::get_circunstancias(&cliente)?;
-    println!("Circunstancias: {:?}",circunstancias);
-
-    let discapacidades = parameters::get_discapacidades(&cliente)?;
-    println!("Discapacidades: {:?}",discapacidades);
-
-    let etnias = parameters::get_etnias(&cliente)?;
-    println!("Etnias: {:?}",etnias);
-
-    let lenguas = parameters::get_lenguas(&cliente)?;
-    println!("Lenguas: {:?}",lenguas);
-
-    let religiones = parameters::get_religiones(&cliente)?;
-    println!("Religiones: {:?}",religiones);
-
-    let emigratorios = parameters::get_emigratorios(&cliente)?;
-    println!("Estatus migratorios: {:?}",emigratorios);
-
-    let parametros = Parametros::new();
+    let mut  parametros = Parametros::new();
+    parametros.id_estado = "9".to_string();
+    parametros.id_municipio = "2".to_string();
 
     let totales = match extractora::totales(&cliente, &parametros) {
         Ok(datos) => datos,
@@ -64,8 +33,8 @@ fn run() -> Result<(), Box<dyn Error>> {
     };
     println!("Totales: {:?}",totales);
 
-    let edades = extractora::por_edades_completo(&cliente, &parametros)?;
-    println!("Edades: {:?}",edades.to_map());
+    let colonias = extractora::por_colonias_completo(&cliente, &parametros)?;
+    println!("Colonias: {:?}",colonias.to_map());
 
     Ok(())
 }

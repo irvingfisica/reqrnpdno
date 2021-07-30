@@ -146,6 +146,51 @@ pub fn por_edades_completo(cliente: &Client, parametros: &Parametros) -> Result<
     Ok(datos)
 }
 
+pub fn por_nacionalidades_completo(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::tabla_detalle_url();
+    let mut params = parametros.to_tuples();
+
+    params.push(("TipoDetalle","2"));
+
+    let response = cliente.post(url).form(&params).send()?;
+    let tabla: Tabla = response.json()?;
+    
+    let datos = parse_table(&tabla)?;
+
+    Ok(datos)
+}
+
+pub fn por_municipios_completo(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::tabla_detalle_url();
+    let mut params = parametros.to_tuples();
+
+    params.push(("TipoDetalle","3"));
+
+    let response = cliente.post(url).form(&params).send()?;
+    let tabla: Tabla = response.json()?;
+    
+    let datos = parse_table(&tabla)?;
+
+    Ok(datos)
+}
+
+pub fn por_colonias_completo(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
+
+    let url = urls::tabla_detalle_url();
+    let mut params = parametros.to_tuples();
+
+    params.push(("TipoDetalle","4"));
+
+    let response = cliente.post(url).form(&params).send()?;
+    let tabla: Tabla = response.json()?;
+    
+    let datos = parse_table(&tabla)?;
+
+    Ok(datos)
+}
+
 fn parse_table(tabla: &Tabla) -> Result<Data, Box<dyn Error>> {
 
     let mut cabeza: BTreeMap<usize,String> = BTreeMap::new();
