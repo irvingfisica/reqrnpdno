@@ -1,10 +1,12 @@
 use std::error::Error;
 use std::collections::BTreeMap;
 use reqwest::blocking::Client;
-use serde::{Deserialize};
+use serde::{Deserialize,Serialize};
 use scraper::{Html,Selector};
 use crate::parameters::Parametros;
 use crate::urls;
+use std::fs::File;
+use std::io::Write;
 
 pub fn totales(cliente: &Client, parametros: &Parametros) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
@@ -191,6 +193,60 @@ pub fn por_colonias_completo(cliente: &Client, parametros: &Parametros) -> Resul
     Ok(datos)
 }
 
+pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
+
+    let mut salida = General::new();
+
+    match totales(&cliente, &parametros) {
+        Ok(datos) => {salida.totales = datos},
+        Err(_) => {println!("No se pudieron obtener los totales")}
+    }
+
+    match (parametros.id_estado.as_str(),parametros.id_municipio.as_str(),parametros.id_colonia.as_str()) {
+        ("0","0","0") => {
+            match por_estado(&cliente, &parametros) {
+                Ok(datos) => {salida.espacial = datos.to_map()},
+                Err(_) => {println!("No se pudo obtener la información espacial")}
+            };
+        },
+        (_,"0","0") => {
+            match por_municipios_completo(&cliente, &parametros) {
+                Ok(datos) => {salida.espacial = datos.to_map()},
+                Err(_) => {println!("No se pudo obtener la información espacial")}
+            };
+        },
+        (_,_,"0") => {
+            match por_colonias_completo(&cliente, &parametros) {
+                Ok(datos) => {salida.espacial = datos.to_map()},
+                Err(_) => {println!("No se pudo obtener la información espacial")}
+            };
+        },
+        (_,_,_) => {}
+    };
+
+    match por_anio(&cliente, &parametros) {
+        Ok(datos) => {salida.anual = datos.to_map()},
+        Err(_) => {println!("No se pudo obtener la información anual")}
+    };
+
+    match por_mes(&cliente, &parametros) {
+        Ok(datos) => {salida.mensual_ultimo_anio = datos.to_map()},
+        Err(_) => {println!("No se pudo obtener la información mensual")}
+    };
+
+    match por_edades_completo(&cliente, &parametros) {
+        Ok(datos) => {salida.por_edad = datos.to_map()},
+        Err(_) => {println!("No se pudo obtener la información por edades")}
+    };
+
+    match por_nacionalidades_completo(&cliente, &parametros) {
+        Ok(datos) => {salida.por_nacionalidad = datos.to_map()},
+        Err(_) => {println!("No se pudo obtener la información por nacionalidades")}
+    };
+
+    salida
+}
+
 fn parse_table(tabla: &Tabla) -> Result<Data, Box<dyn Error>> {
 
     let mut cabeza: BTreeMap<usize,String> = BTreeMap::new();
@@ -277,4 +333,36 @@ pub struct Serie {
 #[serde(rename_all = "PascalCase")]
 pub struct Tabla {
     pub html: String,
+}
+
+#[derive(Debug,Serialize)]
+pub struct General {
+    pub totales: BTreeMap<String,String>,
+    pub espacial: BTreeMap<String,BTreeMap<String,u32>>,
+    pub anual: BTreeMap<String,BTreeMap<String,u32>>,
+    pub mensual_ultimo_anio: BTreeMap<String,BTreeMap<String,u32>>,
+    pub por_edad: BTreeMap<String,BTreeMap<String,u32>>,
+    pub por_nacionalidad: BTreeMap<String,BTreeMap<String,u32>>,
+}
+
+impl General {
+    pub fn new() -> Self {
+        General {
+            totales: BTreeMap::new(),
+            espacial: BTreeMap::new(),
+            anual: BTreeMap::new(),
+            mensual_ultimo_anio: BTreeMap::new(),
+            por_edad: BTreeMap::new(),
+            por_nacionalidad: BTreeMap::new(),
+        }
+    }
+
+    pub fn exportar(&self, ruta: &str) -> Result<(), Box<dyn Error>> {
+        
+        let mut salida = File::create(ruta)?;
+        let j = serde_json::to_string(&self)?;
+        write!(salida, "{}", j)?;
+
+        Ok(())
+    }
 }
