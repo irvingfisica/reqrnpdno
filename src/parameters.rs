@@ -3,6 +3,8 @@ use std::error::Error;
 use serde::{Deserialize};
 use reqwest::blocking::Client;
 use crate::urls;
+use std::fs::File;
+use std::io::Write;
 
 #[derive(Debug)]
 pub struct Parametros {
@@ -107,6 +109,15 @@ impl Parametros {
             ("idHipotesisNoLocalizacion",&self.id_hipotesis_no_localizacion),
             ("idDelito",&self.id_delito)]
     }
+}
+
+pub fn exportar_categorias(categorias: &BTreeMap<String,String>, ruta: &str) -> Result<(), Box<dyn Error>> {
+        
+    let mut salida = File::create(ruta)?;
+    let j = serde_json::to_string(categorias)?;
+    write!(salida, "{}", j)?;
+
+    Ok(())
 }
 
 pub fn get_estados(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
