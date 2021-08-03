@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::error::Error;
-use serde::{Deserialize};
+use serde::{Deserialize, Serialize};
 use reqwest::blocking::Client;
 use crate::urls;
 use std::fs::File;
@@ -139,6 +139,120 @@ pub fn get_estados(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn 
 
     Ok(mapa)
     
+}
+
+pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
+
+    let mut edovec: Vec<Estado> = Vec::new();
+
+    let edourl = urls::estados_url();
+    let munurl = urls::municipios_url();
+    let colurl = urls::colonias_url();
+
+    let edo_resp = cliente.post(edourl).send()?;
+    let estados: Vec<OptionSelect> = edo_resp.json()?;
+
+    for estado in estados {
+        let edo_value = estado.value.to_string();
+        let edo_text = estado.text.to_string();
+        let edo_clave = format!("{:0>2}", edo_value);
+        let mut munvec: Vec<Municipio> = Vec::new();
+        match edo_value.as_str() {
+            "0" => {},
+            _ => {
+                let params = [("idEstado", edo_value.clone())];
+                let mun_resp = cliente.post(munurl.clone()).form(&params).send()?;
+                let municipios: Vec<OptionSelect> = mun_resp.json()?;
+
+                for municipio in municipios {
+                    let mun_value = municipio.value.to_string();
+                    let mun_text = municipio.text.to_string();
+                    let mut mun_clave = edo_clave.to_string();
+                    mun_clave.push_str(&format!("{:0>3}", mun_value));
+                    let mut colvec: Vec<Colonia> = Vec::new();
+                    match mun_value.as_str() {
+                        "0" => {},
+                        _ => {
+                            let params = [("idEstado", edo_value.clone()),("idMunicipio", mun_value.clone())];
+                            let col_resp = cliente.post(colurl.clone()).form(&params).send()?;
+                            let colonias: Vec<OptionSelect> = col_resp.json()?;
+
+                            for colonia in colonias {
+                                let col_value = colonia.value.to_string();
+                                let col_text = colonia.text.to_string();
+                                let mut col_clave = mun_clave.to_string();
+                                col_clave.push_str("-");
+                                col_clave.push_str(&col_value);
+                                match col_value.as_str() {
+                                    "0" => {},
+                                    _ => {
+                                        let colst = Colonia {
+                                            text: col_text,
+                                            value: col_value,
+                                            clave: col_clave,
+                                        };
+                                        colvec.push(colst);
+                                    }
+                                }
+                            }
+
+                            let munst = Municipio {
+                                text: mun_text,
+                                value: mun_value,
+                                clave: mun_clave,
+                                subunidades: colvec,
+                            };
+                            munvec.push(munst);
+                        }
+                    }
+                }
+                
+                println!("{}",edo_text);
+                let edost = Estado {
+                    text: edo_text,
+                    value: edo_value,
+                    clave: edo_clave,
+                    subunidades: munvec,
+                };
+                edovec.push(edost);
+                
+            }
+        }
+    }
+
+    Ok(edovec)
+}
+
+pub fn exportar_espacial(espacial: &Vec<Estado>, ruta: &str) -> Result<(), Box<dyn Error>> {
+        
+    let mut salida = File::create(ruta)?;
+    let j = serde_json::to_string(espacial)?;
+    write!(salida, "{}", j)?;
+
+    Ok(())
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+struct Colonia {
+    text: String,
+    clave: String,
+    value: String, 
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+struct Municipio {
+    text: String,
+    clave: String,
+    value: String,
+    subunidades: Vec<Colonia>
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Estado {
+    text: String,
+    clave: String,
+    value: String,
+    subunidades: Vec<Municipio>
 }
 
 pub fn get_municipios(cliente: &Client, estado: &str) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
@@ -393,7 +507,7 @@ pub fn get_emigratorios(cliente: &Client) -> Result<BTreeMap<String,String>, Box
     
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize,Debug)]
 #[serde(rename_all = "PascalCase")]
 struct OptionSelect {
     text: String,

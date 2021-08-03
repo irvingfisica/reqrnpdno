@@ -11,10 +11,13 @@ fn main () {
 
 fn run() -> Result<(), Box<dyn Error>> {
 
-    let cliente = cliente::cliente_nuevo()?;
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    //let espacial = parameters::get_all_espacial(&cliente)?;
+    //parameters::exportar_espacial(&espacial, "./datos_procesados/espacial.json")?;
 
     // let estados = parameters::get_estados(&cliente)?;
-    // parameters::exportar_categorias(&estados, "./datos_procesados/estados.json")?;
+    //parameters::exportar_categorias(&estados, "./datos_procesados/estados.json")?;
 
     // let nacionalidades = parameters::get_nacionalidades(&cliente)?;
     // parameters::exportar_categorias(&nacionalidades, "./datos_procesados/nacionalidades.json")?;
@@ -23,7 +26,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     // parameters::exportar_categorias(&hipotesis, "./datos_procesados/hipotesis.json")?;
 
     // let delitos = parameters::get_delitos(&cliente)?;
-    // parameters::exportar_categorias(&delitos, "./datos_procesados/estados.json")?;
+    // parameters::exportar_categorias(&delitos, "./datos_procesados/delitos.json")?;
 
     // let medios = parameters::get_medios(&cliente)?;
     // parameters::exportar_categorias(&medios, "./datos_procesados/medios.json")?;
@@ -45,16 +48,48 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     // let emigratorios = parameters::get_emigratorios(&cliente)?;
     // parameters::exportar_categorias(&emigratorios, "./datos_procesados/emigratorios.json")?;
+    
+    // println!("{:?}",emigratorios);
 
-    let mut  parametros = Parametros::new();
-    // parametros.id_estado = "9".to_string();
-    // parametros.id_municipio = "2".to_string();
-    parametros.id_circunstancia = "13".to_string();
+    // let mut parametros = Parametros::new();
 
-    let salida = extractora::completa(&cliente, &parametros);
-    println!("{:?}",salida);
+    // for (llave,dato) in estados {
 
-    salida.exportar("./datos_procesados/circ_13.json")?;
+    //     match dato.as_str() {
+    //         "0" => {},
+    //         _ => {
+    //             parametros.id_estado = dato.to_string();
+
+    //             let municipios = parameters::get_municipios(&cliente, &dato)?;
+
+    //             for (mllave, mdato) in municipios {
+    //                 println!("{},{}: {},{}",mdato,dato,llave,mllave);
+    //                 cliente = cliente::cliente_nuevo()?;
+    //                 parametros.id_municipio = mdato.to_string();
+    //                 let salida = extractora::completa(&cliente, &parametros);
+
+    //                 let mut ruta = "./datos_procesados/municipios/".to_string();
+    //                 ruta.push_str(&dato);
+    //                 ruta.push_str("_");
+    //                 ruta.push_str(&mdato);
+    //                 ruta.push_str(".json");
+
+    //                 salida.exportar(&ruta)?;
+    //             }
+    //         }
+    //     }
+    // };
+
+    // let categoria = "sindicalista";
+    // parametros.es_sindicalista = "true".to_string();
+
+    // let salida = extractora::completa(&cliente, &parametros);
+    // let mut ruta = "./datos_procesados/por_categoria/".to_string();
+    // ruta.push_str(categoria);
+    // ruta.push_str(".json");
+    // salida.exportar(&ruta)?;
+
+    // salida.exportar(",/datos_procesados/test.json")?;
 
     Ok(())
 }
