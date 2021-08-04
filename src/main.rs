@@ -51,7 +51,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     
     // println!("{:?}",emigratorios);
 
-    // let mut parametros = Parametros::new();
+    let mut parametros = Parametros::new();
 
     // for (llave,dato) in estados {
 
@@ -83,13 +83,13 @@ fn run() -> Result<(), Box<dyn Error>> {
     // let categoria = "sindicalista";
     // parametros.es_sindicalista = "true".to_string();
 
-    // let salida = extractora::completa(&cliente, &parametros);
+    let salida = extractora::completa(&cliente, &parametros);
     // let mut ruta = "./datos_procesados/por_categoria/".to_string();
     // ruta.push_str(categoria);
     // ruta.push_str(".json");
     // salida.exportar(&ruta)?;
 
-    // salida.exportar(",/datos_procesados/test.json")?;
+    salida.exportar("./datos_procesados/nacional.json")?;
 
     Ok(())
 }
