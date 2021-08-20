@@ -107,10 +107,11 @@ pub fn extraer_por_estatus_victimas(parametros: &Parametros, ruta: &str) -> Resu
 
     let estatus = parameters::get_estatus_victimas()?;
 
-    for (_,dato) in estatus {
+    for (titulo,dato) in estatus {
 
         let cliente = cliente::cliente_nuevo()?;
         params.id_estatus_victima = dato.to_string();
+        params.titulo = titulo.to_string();
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
