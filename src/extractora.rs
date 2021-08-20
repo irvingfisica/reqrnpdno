@@ -5,8 +5,623 @@ use serde::{Deserialize,Serialize};
 use scraper::{Html,Selector};
 use crate::parameters::Parametros;
 use crate::urls;
+use crate::cliente;
+use crate::parameters;
 use std::fs::File;
+use std::fs;
 use std::io::Write;
+
+pub fn get_diccionarios(ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/diccionarios");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut ruta_evictimas = ruta_dir.to_string();
+    ruta_evictimas.push_str("/estatus_victimas.json");
+    let evictimas = parameters::get_estatus_victimas()?;
+    parameters::exportar_categorias(&evictimas, &ruta_evictimas)?;
+
+    let cliente = cliente::cliente_nuevo()?;
+
+    let mut ruta_espacial = ruta_dir.to_string();
+    ruta_espacial.push_str("/espacial.json");
+    let espacial = parameters::get_all_espacial(&cliente)?;
+    parameters::exportar_espacial(&espacial, &ruta_espacial)?;
+
+    let mut ruta_estados = ruta_dir.to_string();
+    ruta_estados.push_str("/estados.json");
+    let estados = parameters::get_estados(&cliente)?;
+    parameters::exportar_categorias(&estados, &ruta_estados)?;
+
+    let mut ruta_nacionalidades = ruta_dir.to_string();
+    ruta_nacionalidades.push_str("/nacionalidades.json");
+    let nacionalidades = parameters::get_nacionalidades(&cliente)?;
+    parameters::exportar_categorias(&nacionalidades, &ruta_nacionalidades)?;
+
+    let mut ruta_hipotesis = ruta_dir.to_string();
+    ruta_hipotesis.push_str("/hipotesis.json");
+    let hipotesis = parameters::get_hipotesis(&cliente)?;
+    parameters::exportar_categorias(&hipotesis, &ruta_hipotesis)?;
+
+    let mut ruta_delitos = ruta_dir.to_string();
+    ruta_delitos.push_str("/delitos.json");
+    let delitos = parameters::get_delitos(&cliente)?;
+    parameters::exportar_categorias(&delitos, &ruta_delitos)?;
+
+    let mut ruta_medios = ruta_dir.to_string();
+    ruta_medios.push_str("/medios.json");
+    let medios = parameters::get_medios(&cliente)?;
+    parameters::exportar_categorias(&medios, &ruta_medios)?;
+
+    let mut ruta_circunstancias = ruta_dir.to_string();
+    ruta_circunstancias.push_str("/circunstancias.json");
+    let circunstancias = parameters::get_circunstancias(&cliente)?;
+    parameters::exportar_categorias(&circunstancias, &ruta_circunstancias)?;
+
+    let mut ruta_discapapcidades = ruta_dir.to_string();
+    ruta_discapapcidades.push_str("/discapacidades.json");
+    let discapacidades = parameters::get_discapacidades(&cliente)?;
+    parameters::exportar_categorias(&discapacidades, &ruta_discapapcidades)?;
+
+    let mut ruta_etnias = ruta_dir.to_string();
+    ruta_etnias.push_str("/etnias.json");
+    let etnias = parameters::get_etnias(&cliente)?;
+    parameters::exportar_categorias(&etnias, &ruta_etnias)?;
+
+    let mut ruta_lenguas = ruta_dir.to_string();
+    ruta_lenguas.push_str("/lenguas.json");
+    let lenguas = parameters::get_lenguas(&cliente)?;
+    parameters::exportar_categorias(&lenguas, &ruta_lenguas)?;
+
+    let mut ruta_religiones = ruta_dir.to_string();
+    ruta_religiones.push_str("/religiones.json");
+    let religiones = parameters::get_religiones(&cliente)?;
+    parameters::exportar_categorias(&religiones, &ruta_religiones)?;
+
+    let mut ruta_emigratorios = ruta_dir.to_string();
+    ruta_emigratorios.push_str("/estatus_migratorios.json");
+    let emigratorios = parameters::get_emigratorios(&cliente)?;
+    parameters::exportar_categorias(&emigratorios, &ruta_emigratorios)?;
+
+    Ok(())
+}
+
+pub fn extraer_por_estatus_victimas(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/estatus_victimas");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+
+    let estatus = parameters::get_estatus_victimas()?;
+
+    for (_,dato) in estatus {
+
+        let cliente = cliente::cliente_nuevo()?;
+        params.id_estatus_victima = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_estados(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/estados");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let estados = parameters::get_estados(&cliente)?;
+
+    for (_,dato) in estados {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_estado = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_municipios(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/municipios");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let estados = parameters::get_estados(&cliente)?;
+
+    for (_,dato) in estados {
+
+        match dato.as_str() {
+            "0" => {},
+            _ => {
+                params.id_estado = dato.to_string();
+
+                let municipios = parameters::get_municipios(&cliente, &dato)?;
+
+                for (_, mdato) in municipios {
+                    cliente = cliente::cliente_nuevo()?;
+                    params.id_municipio = mdato.to_string();
+                    let salida = completa(&cliente, &params);
+
+                    let mut rutam = ruta_dir.to_string();
+                    rutam.push_str("/");
+                    rutam.push_str(&dato);
+                    rutam.push_str("_");
+                    rutam.push_str(&mdato);
+                    rutam.push_str(".json");
+
+                    salida.exportar(&rutam)?;
+                }
+            }
+        }
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_hipotesis(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/hipotesis");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let hipotesis = parameters::get_hipotesis(&cliente)?;
+
+    for (_,dato) in hipotesis {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_hipotesis_no_localizacion = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_delitos(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/delitos");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let delitos = parameters::get_delitos(&cliente)?;
+
+    for (_,dato) in delitos {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_delito = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_medios(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/medios");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let medios = parameters::get_medios(&cliente)?;
+
+    for (_,dato) in medios {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_medio_conocimiento = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_circunstancias(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/circunstancias");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let circunstancias = parameters::get_circunstancias(&cliente)?;
+
+    for (_,dato) in circunstancias {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_circunstancia = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_discapacidades(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/discapacidades");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let discapacidades = parameters::get_discapacidades(&cliente)?;
+
+    for (_,dato) in discapacidades {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.tiene_discapacidad = "true".to_string();
+        params.id_tipo_discapacidad = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_etnias(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/etnias");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let etnias = parameters::get_etnias(&cliente)?;
+
+    for (_,dato) in etnias {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_etnia = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_lenguas(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/lenguas");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let lenguas = parameters::get_lenguas(&cliente)?;
+
+    for (_,dato) in lenguas {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_lengua = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_religiones(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/religiones");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let religiones = parameters::get_religiones(&cliente)?;
+
+    for (_,dato) in religiones {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.id_religion = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_estatus_migratorio(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/estatus_migratorio");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente = cliente::cliente_nuevo()?;
+
+    let emigratorios = parameters::get_emigratorios(&cliente)?;
+
+    for (_,dato) in emigratorios {
+
+        cliente = cliente::cliente_nuevo()?;
+        params.es_migrante = "true".to_string();
+        params.id_estatus_migratorio = dato.to_string();
+        let salida = completa(&cliente, &params);
+
+        let mut rutam = ruta_dir.to_string();
+        rutam.push_str("/");
+        rutam.push_str(&dato);
+        rutam.push_str(".json");
+
+        salida.exportar(&rutam)?;
+
+    };
+
+    Ok(())
+}
+
+pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut ruta_dir = ruta.to_string();
+    ruta_dir.push_str("/por_categoria");
+    match fs::read_dir(&ruta_dir) {
+        Ok(_) => {},
+        _ => {
+            fs::create_dir(&ruta_dir)?;
+        }
+    };
+
+    let mut params = parametros.clone();
+    let mut cliente;
+
+    let categoria = "sindicalista";
+    params.es_sindicalista = "true".to_string();
+    cliente = cliente::cliente_nuevo()?;
+    let salida = completa(&cliente, &params);
+    let mut rutam = ruta_dir.to_string();
+    rutam.push_str("/");
+    rutam.push_str(categoria);
+    rutam.push_str(".json");
+    salida.exportar(&rutam)?;
+    params.es_sindicalista = "".to_string();
+
+    let categoria = "servidor_publico";
+    params.es_servidor_publico = "true".to_string();
+    cliente = cliente::cliente_nuevo()?;
+    let salida = completa(&cliente, &params);
+    let mut rutam = ruta_dir.to_string();
+    rutam.push_str("/");
+    rutam.push_str(categoria);
+    rutam.push_str(".json");
+    salida.exportar(&rutam)?;
+    params.es_servidor_publico = "".to_string();
+
+    let categoria = "periodista";
+    params.es_periodista = "true".to_string();
+    cliente = cliente::cliente_nuevo()?;
+    let salida = completa(&cliente, &params);
+    let mut rutam = ruta_dir.to_string();
+    rutam.push_str("/");
+    rutam.push_str(categoria);
+    rutam.push_str(".json");
+    salida.exportar(&rutam)?;
+    params.es_periodista = "".to_string();
+
+    let categoria = "ong";
+    params.es_ong = "true".to_string();
+    cliente = cliente::cliente_nuevo()?;
+    let salida = completa(&cliente, &params);
+    let mut rutam = ruta_dir.to_string();
+    rutam.push_str("/");
+    rutam.push_str(categoria);
+    rutam.push_str(".json");
+    salida.exportar(&rutam)?;
+    params.es_ong = "".to_string();
+
+    let categoria = "migrante";
+    params.es_migrante = "true".to_string();
+    cliente = cliente::cliente_nuevo()?;
+    let salida = completa(&cliente, &params);
+    let mut rutam = ruta_dir.to_string();
+    rutam.push_str("/");
+    rutam.push_str(categoria);
+    rutam.push_str(".json");
+    salida.exportar(&rutam)?;
+    params.es_migrante = "".to_string();
+
+    let categoria = "lgbttti";
+    params.es_lgbttti = "true".to_string();
+    cliente = cliente::cliente_nuevo()?;
+    let salida = completa(&cliente, &params);
+    let mut rutam = ruta_dir.to_string();
+    rutam.push_str("/");
+    rutam.push_str(categoria);
+    rutam.push_str(".json");
+    salida.exportar(&rutam)?;
+    params.es_lgbttti = "".to_string();
+
+    let categoria = "defensor_dh";
+    params.es_defensor_dh = "true".to_string();
+    cliente = cliente::cliente_nuevo()?;
+    let salida = completa(&cliente, &params);
+    let mut rutam = ruta_dir.to_string();
+    rutam.push_str("/");
+    rutam.push_str(categoria);
+    rutam.push_str(".json");
+    salida.exportar(&rutam)?;
+    params.es_defensor_dh = "".to_string();
+
+    Ok(())
+}
+
+pub fn extraer_nacional(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let params = parametros.clone();
+    let cliente = cliente::cliente_nuevo()?;
+
+    let salida = completa(&cliente, &params);
+
+    let mut rutam = ruta.to_string();
+    rutam.push_str("/");
+    rutam.push_str("nacional.json");
+
+    salida.exportar(&rutam)?;
+
+    Ok(())
+}
 
 pub fn totales(cliente: &Client, parametros: &Parametros) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
@@ -195,7 +810,7 @@ pub fn por_colonias_completo(cliente: &Client, parametros: &Parametros) -> Resul
 
 pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
 
-    let mut salida = General::new();
+    let mut salida = General::new(parametros);
 
     match totales(&cliente, &parametros) {
         Ok(datos) => {salida.totales = datos},
@@ -343,10 +958,11 @@ pub struct General {
     pub mensual_ultimo_anio: BTreeMap<String,BTreeMap<String,u32>>,
     pub por_edad: BTreeMap<String,BTreeMap<String,u32>>,
     pub por_nacionalidad: BTreeMap<String,BTreeMap<String,u32>>,
+    pub parametros: Parametros,
 }
 
 impl General {
-    pub fn new() -> Self {
+    pub fn new(parametros: &Parametros) -> Self {
         General {
             totales: BTreeMap::new(),
             espacial: BTreeMap::new(),
@@ -354,6 +970,7 @@ impl General {
             mensual_ultimo_anio: BTreeMap::new(),
             por_edad: BTreeMap::new(),
             por_nacionalidad: BTreeMap::new(),
+            parametros: parametros.clone(),
         }
     }
 

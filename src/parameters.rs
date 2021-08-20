@@ -5,8 +5,8 @@ use reqwest::blocking::Client;
 use crate::urls;
 use std::fs::File;
 use std::io::Write;
-
-#[derive(Debug)]
+  
+#[derive(Debug, Clone, Serialize)]
 pub struct Parametros {
     pub titulo: String,
     pub id_estatus_victima: String,
@@ -120,6 +120,22 @@ pub fn exportar_categorias(categorias: &BTreeMap<String,String>, ruta: &str) -> 
     Ok(())
 }
 
+pub fn get_estatus_victimas() -> Result<BTreeMap<String,String>, Box<dyn Error>> {
+
+    let mut mapa = BTreeMap::new();
+
+    mapa.insert("PERSONAS DESAPARECIDAS, NO LOCALIZADAS Y LOCALIZADAS".to_string(),"0".to_string());
+    mapa.insert("PERSONAS LOCALIZADAS CON VIDA".to_string(),"2".to_string());
+    mapa.insert("PERSONAS LOCALIZADAS SIN VIDA".to_string(),"3".to_string());
+    mapa.insert("PERSONAS DESAPARECIDAS".to_string(),"4".to_string());
+    mapa.insert("PERSONAS NO LOCALIZADAS".to_string(),"5".to_string());
+    mapa.insert("PERSONAS LOCALIZADAS".to_string(),"6".to_string());
+    mapa.insert("PERSONAS DESAPARECIDAS Y NO LOCALIZADAS".to_string(),"7".to_string());
+
+    Ok(mapa)
+
+}
+
 pub fn get_estados(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -207,7 +223,7 @@ pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
                     }
                 }
                 
-                println!("{}",edo_text);
+                //println!("{}",edo_text);
                 let edost = Estado {
                     text: edo_text,
                     value: edo_value,
