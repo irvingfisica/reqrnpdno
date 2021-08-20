@@ -19,8 +19,8 @@ fn run() -> Result<(), Box<dyn Error>> {
     let mut parametros = Parametros::new();
     parametros.id_estatus_victima = "7".to_string();
     parametros.titulo = "PERSONAS DESAPARECIDAS Y NO LOCALIZADAS".to_string();
-    parametros.fecha_inicio = "2021-08-20".to_string();
-    parametros.fecha_fin = "2000-01-01".to_string();
+    parametros.fecha_inicio = "2000-01-01".to_string();
+    parametros.fecha_fin = "2021-08-20".to_string();
 
     extractora::extraer_nacional(&parametros, &ruta_salida)?;
     extractora::extraer_por_municipios(&parametros, &ruta_salida)?;
