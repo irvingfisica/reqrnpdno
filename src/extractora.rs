@@ -629,7 +629,10 @@ pub fn totales(cliente: &Client, parametros: &Parametros) -> Result<BTreeMap<Str
     let url = urls::totales_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos totales no se concretó - {}", err)))
+    };
     let mut datos: BTreeMap<String,String> = response.json()?;
 
     for (_key,value) in datos.iter_mut() {
@@ -644,7 +647,10 @@ pub fn por_estado(cliente: &Client, parametros: &Parametros) -> Result<Data, Box
     let url = urls::por_estado_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición datos por estado no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -655,7 +661,10 @@ pub fn por_municipio(cliente: &Client, parametros: &Parametros) -> Result<Data, 
     let url = urls::por_municipio_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por municipio no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -666,7 +675,10 @@ pub fn por_colonia(cliente: &Client, parametros: &Parametros) -> Result<Data, Bo
     let url = urls::por_colonia_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por colonia no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -677,7 +689,10 @@ pub fn por_anio(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<d
     let url = urls::por_anio_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por año no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -688,7 +703,10 @@ pub fn por_mes(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dy
     let url = urls::ultimo_anio_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por mes no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -699,7 +717,10 @@ pub fn por_rango_edad(cliente: &Client, parametros: &Parametros) -> Result<Data,
     let url = urls::rango_edad_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por rango de edad no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -710,7 +731,10 @@ pub fn por_nacionalidad(cliente: &Client, parametros: &Parametros) -> Result<Dat
     let url = urls::nacionalidad_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por nacionalidad no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -721,7 +745,10 @@ pub fn fiscalias(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<
     let url = urls::fiscalias_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por fiscalias no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -732,7 +759,10 @@ pub fn comisiones(cliente: &Client, parametros: &Parametros) -> Result<Data, Box
     let url = urls::comisiones_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por comisiones no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -743,7 +773,10 @@ pub fn portal(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn
     let url = urls::portal_url();
     let params = parametros.to_tuples();
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos por portal no se concretó - {}", err)))
+    };
     let datos: Data = response.json()?;
 
     Ok(datos)
@@ -756,7 +789,10 @@ pub fn por_edades_completo(cliente: &Client, parametros: &Parametros) -> Result<
 
     params.push(("TipoDetalle","5"));
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos de tabla de edad no se concretó - {}", err)))
+    };
     let tabla: Tabla = response.json()?;
     
     let datos = parse_table(&tabla)?;
@@ -771,7 +807,10 @@ pub fn por_nacionalidades_completo(cliente: &Client, parametros: &Parametros) ->
 
     params.push(("TipoDetalle","2"));
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos de tabla de nacionalidad no se concretó - {}", err)))
+    };
     let tabla: Tabla = response.json()?;
     
     let datos = parse_table(&tabla)?;
@@ -786,7 +825,10 @@ pub fn por_municipios_completo(cliente: &Client, parametros: &Parametros) -> Res
 
     params.push(("TipoDetalle","3"));
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos de tabla de municipios no se concretó - {}", err)))
+    };
     let tabla: Tabla = response.json()?;
     
     let datos = parse_table(&tabla)?;
@@ -801,7 +843,10 @@ pub fn por_colonias_completo(cliente: &Client, parametros: &Parametros) -> Resul
 
     params.push(("TipoDetalle","4"));
 
-    let response = cliente.post(url).form(&params).send()?;
+    let response = match cliente.post(url).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de datos de tabla de colonias no se concretó - {}", err)))
+    };
     let tabla: Tabla = response.json()?;
     
     let datos = parse_table(&tabla)?;
@@ -815,26 +860,26 @@ pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
 
     match totales(&cliente, &parametros) {
         Ok(datos) => {salida.totales = datos},
-        Err(_) => {println!("No se pudieron obtener los totales")}
+        Err(err) => {println!("No se pudieron obtener los totales - {}",err)}
     }
 
     match (parametros.id_estado.as_str(),parametros.id_municipio.as_str(),parametros.id_colonia.as_str()) {
         ("0","0","0") => {
             match por_estado(&cliente, &parametros) {
                 Ok(datos) => {salida.espacial = datos.to_map()},
-                Err(_) => {println!("No se pudo obtener la información espacial")}
+                Err(err) => {println!("No se pudo obtener la información espacial - {}",err)}
             };
         },
         (_,"0","0") => {
             match por_municipios_completo(&cliente, &parametros) {
                 Ok(datos) => {salida.espacial = datos.to_map()},
-                Err(_) => {println!("No se pudo obtener la información espacial")}
+                Err(err) => {println!("No se pudo obtener la información espacial - {}",err)}
             };
         },
         (_,_,"0") => {
             match por_colonias_completo(&cliente, &parametros) {
                 Ok(datos) => {salida.espacial = datos.to_map()},
-                Err(_) => {println!("No se pudo obtener la información espacial")}
+                Err(err) => {println!("No se pudo obtener la información espacial - {}", err)}
             };
         },
         (_,_,_) => {}
@@ -842,22 +887,22 @@ pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
 
     match por_anio(&cliente, &parametros) {
         Ok(datos) => {salida.anual = datos.to_map()},
-        Err(_) => {println!("No se pudo obtener la información anual")}
+        Err(err) => {println!("No se pudo obtener la información anual - {}", err)}
     };
 
     match por_mes(&cliente, &parametros) {
         Ok(datos) => {salida.mensual_ultimo_anio = datos.to_map()},
-        Err(_) => {println!("No se pudo obtener la información mensual")}
+        Err(err) => {println!("No se pudo obtener la información mensual - {}", err)}
     };
 
     match por_edades_completo(&cliente, &parametros) {
         Ok(datos) => {salida.por_edad = datos.to_map()},
-        Err(_) => {println!("No se pudo obtener la información por edades")}
+        Err(err) => {println!("No se pudo obtener la información por edades - {}", err)}
     };
 
     match por_nacionalidades_completo(&cliente, &parametros) {
         Ok(datos) => {salida.por_nacionalidad = datos.to_map()},
-        Err(_) => {println!("No se pudo obtener la información por nacionalidades")}
+        Err(err) => {println!("No se pudo obtener la información por nacionalidades - {}", err)}
     };
 
     salida

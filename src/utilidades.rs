@@ -9,7 +9,10 @@ pub fn crear_directorio(ruta: &str, nombre: &str) -> Result<String, Box<dyn Erro
     match fs::read_dir(&ruta_salida) {
         Ok(_) => {},
         _ => {
-            fs::create_dir(&ruta_salida)?;
+            match fs::create_dir(&ruta_salida) {
+                Ok(_) => {},
+                Err(err) => return Err(From::from(format!("El directorio no se pudo crear - {}", err)))
+            }
         }
     };
 

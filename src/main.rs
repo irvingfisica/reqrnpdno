@@ -1,8 +1,4 @@
-use reqrnpdno::parameters;
-use reqrnpdno::extractora;
-use reqrnpdno::utilidades;
-use parameters::Parametros;
-
+use reqrnpdno::{extractora,utilidades,parameters::Parametros};
 use std::error::Error;
 
 fn main () {

@@ -141,7 +141,10 @@ pub fn get_estados(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn 
     let mut mapa = BTreeMap::new();
     let edourl = urls::estados_url();
 
-    let edo_resp = cliente.post(edourl).send()?;
+    let edo_resp = match cliente.post(edourl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de estados no se concretó - {}", err)))
+    };
 
     let estados: Vec<OptionSelect> = edo_resp.json()?;
 
@@ -165,7 +168,11 @@ pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
     let munurl = urls::municipios_url();
     let colurl = urls::colonias_url();
 
-    let edo_resp = cliente.post(edourl).send()?;
+    let edo_resp = match cliente.post(edourl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de estados no se concretó - {}", err)))
+    };
+
     let estados: Vec<OptionSelect> = edo_resp.json()?;
 
     for estado in estados {
@@ -177,7 +184,10 @@ pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
             "0" => {},
             _ => {
                 let params = [("idEstado", edo_value.clone())];
-                let mun_resp = cliente.post(munurl.clone()).form(&params).send()?;
+                let mun_resp = match cliente.post(munurl.clone()).form(&params).send() {
+                    Ok(respuesta) => respuesta,
+                    Err(err) => return Err(From::from(format!("La petición de municipios no se concretó - {}", err)))
+                };
                 let municipios: Vec<OptionSelect> = mun_resp.json()?;
 
                 for municipio in municipios {
@@ -190,7 +200,10 @@ pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
                         "0" => {},
                         _ => {
                             let params = [("idEstado", edo_value.clone()),("idMunicipio", mun_value.clone())];
-                            let col_resp = cliente.post(colurl.clone()).form(&params).send()?;
+                            let col_resp = match cliente.post(colurl.clone()).form(&params).send() {
+                                Ok(respuesta) => respuesta,
+                                Err(err) => return Err(From::from(format!("La petición de colonias no se concretó - {}", err)))
+                            };
                             let colonias: Vec<OptionSelect> = col_resp.json()?;
 
                             for colonia in colonias {
@@ -277,7 +290,10 @@ pub fn get_municipios(cliente: &Client, estado: &str) -> Result<BTreeMap<String,
     let munurl = urls::municipios_url();
 
     let params = [("idEstado", estado)];
-    let mun_resp = cliente.post(munurl).form(&params).send()?;
+    let mun_resp = match cliente.post(munurl).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de municipios no se concretó - {}", err)))
+    };
 
     let municipios: Vec<OptionSelect> = mun_resp.json()?;
 
@@ -298,7 +314,10 @@ pub fn get_colonias(cliente: &Client, estado: &str, municipio: &str) -> Result<B
     let colurl = urls::colonias_url();
 
     let params = [("idEstado", estado),("idMunicipio", municipio)];
-    let col_resp = cliente.post(colurl).form(&params).send()?;
+    let col_resp = match cliente.post(colurl).form(&params).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de colonias no se concretó - {}", err)))
+    };
 
     let colonias: Vec<OptionSelect> = col_resp.json()?;
 
@@ -318,7 +337,10 @@ pub fn get_nacionalidades(cliente: &Client) -> Result<BTreeMap<String,String>, B
     let mut mapa = BTreeMap::new();
     let nacurl = urls::nacionalidades_url();
 
-    let nac_resp = cliente.post(nacurl).send()?;
+    let nac_resp = match cliente.post(nacurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de nacionalidades no se concretó - {}", err)))
+    };
 
     let nacionalidades: Vec<OptionSelect> = nac_resp.json()?;
 
@@ -339,7 +361,10 @@ pub fn get_hipotesis(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dy
     let mut mapa = BTreeMap::new();
     let hipurl = urls::hipotesis_url();
 
-    let hip_resp = cliente.post(hipurl).send()?;
+    let hip_resp = match cliente.post(hipurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de hipotesis no se concretó - {}", err)))
+    };
 
     let hipotesis: Vec<OptionSelect> = hip_resp.json()?;
 
@@ -360,7 +385,10 @@ pub fn get_delitos(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn 
     let mut mapa = BTreeMap::new();
     let delurl = urls::delitos_url();
 
-    let del_resp = cliente.post(delurl).send()?;
+    let del_resp = match cliente.post(delurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de delitos no se concretó - {}", err)))
+    };
 
     let delitos: Vec<OptionSelect> = del_resp.json()?;
 
@@ -381,7 +409,10 @@ pub fn get_medios(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn E
     let mut mapa = BTreeMap::new();
     let medurl = urls::medios_url();
 
-    let med_resp = cliente.post(medurl).send()?;
+    let med_resp = match cliente.post(medurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de medios no se concretó - {}", err)))
+    };
 
     let medios: Vec<OptionSelect> = med_resp.json()?;
 
@@ -402,7 +433,10 @@ pub fn get_circunstancias(cliente: &Client) -> Result<BTreeMap<String,String>, B
     let mut mapa = BTreeMap::new();
     let cirurl = urls::circunstancias_url();
 
-    let cir_resp = cliente.post(cirurl).send()?;
+    let cir_resp = match cliente.post(cirurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de circunstancias no se concretó - {}", err)))
+    };
 
     let circunstancias: Vec<OptionSelect> = cir_resp.json()?;
 
@@ -423,7 +457,10 @@ pub fn get_discapacidades(cliente: &Client) -> Result<BTreeMap<String,String>, B
     let mut mapa = BTreeMap::new();
     let disurl = urls::discapacidades_url();
 
-    let dis_resp = cliente.post(disurl).send()?;
+    let dis_resp = match cliente.post(disurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de discapacidades no se concretó - {}", err)))
+    };
 
     let discapacidades: Vec<OptionSelect> = dis_resp.json()?;
 
@@ -444,7 +481,10 @@ pub fn get_etnias(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn E
     let mut mapa = BTreeMap::new();
     let etnurl = urls::etnias_url();
 
-    let etn_resp = cliente.post(etnurl).send()?;
+    let etn_resp = match cliente.post(etnurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de etnias no se concretó - {}", err)))
+    };
 
     let etnias: Vec<OptionSelect> = etn_resp.json()?;
 
@@ -465,7 +505,10 @@ pub fn get_lenguas(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn 
     let mut mapa = BTreeMap::new();
     let lenurl = urls::lenguas_url();
 
-    let len_resp = cliente.post(lenurl).send()?;
+    let len_resp = match cliente.post(lenurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de lenguas no se concretó - {}", err)))
+    };
 
     let lenguas: Vec<OptionSelect> = len_resp.json()?;
 
@@ -486,7 +529,10 @@ pub fn get_religiones(cliente: &Client) -> Result<BTreeMap<String,String>, Box<d
     let mut mapa = BTreeMap::new();
     let relurl = urls::religiones_url();
 
-    let rel_resp = cliente.post(relurl).send()?;
+    let rel_resp = match cliente.post(relurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de religiones no se concretó - {}", err)))
+    };
 
     let religiones: Vec<OptionSelect> = rel_resp.json()?;
 
@@ -507,7 +553,10 @@ pub fn get_emigratorios(cliente: &Client) -> Result<BTreeMap<String,String>, Box
     let mut mapa = BTreeMap::new();
     let emiurl = urls::emigratorio_url();
 
-    let emi_resp = cliente.post(emiurl).send()?;
+    let emi_resp = match cliente.post(emiurl).send() {
+        Ok(respuesta) => respuesta,
+        Err(err) => return Err(From::from(format!("La petición de estatus migratorios no se concretó - {}", err)))
+    };
 
     let estatus: Vec<OptionSelect> = emi_resp.json()?;
 
