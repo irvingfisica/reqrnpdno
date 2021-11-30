@@ -62,7 +62,10 @@ fn main () {
     // Aquí creamos la estructura de los parámetros necesarios para realizar la petición. Esta estructura es la que se necesita modificar si quieres aplicar algún filtro. Si no quieres filtrar no es necesario modificar la estructura. 
     let mut parametros = Parametros::new();
 
-    // Aquí se modifican los valores de los parámetros para aplicar algunos filtros, en este caso se coloca el valor "7" en el campo "id_estatus_victima" el cual corresponde a "PERSONAS DESAPARECIDAS Y NO LOCALIZADAS". También cambiamos el parámetro "titulo" y colocamos el título. Además usamos los parámetros "fecha_inicio" y "fecha_fin" para limitar la búsqueda a un rango de fechas.
+    // Aquí se modifican los valores de los parámetros para aplicar algunos filtros. 
+    // En este caso se coloca el valor "7" en el campo "id_estatus_victima" el cual corresponde a "PERSONAS DESAPARECIDAS Y NO LOCALIZADAS". 
+    // También cambiamos el parámetro "titulo" y colocamos el título. 
+    // Además usamos los parámetros "fecha_inicio" y "fecha_fin" para limitar la búsqueda a un rango de fechas.
     parametros.id_estatus_victima = "7".to_string();
     parametros.titulo = "PERSONAS DESAPARECIDAS Y NO LOCALIZADAS".to_string();
     parametros.fecha_inicio = "2000-01-01".to_string();
@@ -70,6 +73,75 @@ fn main () {
 
     // Por último, utilizamos la función de alto nivel "extraer" para obtener nuestros datos.
     extractora::extraer(&parametros, &rutam).unwrap();
+
+}
+~~~
+
+### Ejemplo de creación de diccionarios
+
+El siguiente ejemplo muestra como crear los diccionarios. Para ejecutar este ejemplo necesitas modificar el archivo main.rs en la carpeta src y colocar lo siguiente:
+
+~~~rust
+use reqrnpdno::extractora;
+
+fn main () {
+
+    // Definimos la ruta donde se escribirán los diccionarios, en este caso la ruta es un directorio.
+    let ruta_salida = "./".to_string();
+
+    // Obtener los diccionarios
+    extractora::get_diccionarios(&ruta_salida).unwrap();
+
+}
+~~~
+
+### Ejemplo de petición iterando una variable
+
+A veces queremos los datos desagregados por alguna de las variables con las cuales es posible filtrar en la plataforma del RNPDNO. Es decir, quisieramos iterar sobre todos los valores posibles para una variable. El crate contiene funciones de alto nivel para poder realizar estas peticiones iteradas sin tener que escribir un ciclo. En este ejemplo queremos iterar sobre la variable circunstancias por lo cual usaremos la función "extraer_por_circunstancias()". La salida de todas estas funciones que iteran es un archivo por cada uno de los valores de la variable, por lo cual la ruta necesita ser un directorio. Para ejecutar este ejemplo necesitas modificar el archivo main.rs en la carpeta src y colocar lo siguiente: 
+
+~~~rust
+use reqrnpdno::{extractora,parameters::Parametros};
+
+fn main () {
+
+    // Aquí se define la ruta en donde se guardarán los datos. En este caso es el directorio salida. 
+    // Puedes cambiar el nombre pero tiene que ser un directorio que exista.
+    let ruta_salida = "./salida/".to_string();
+
+    // Aquí creamos la estructura de los parámetros necesarios para realizar la petición. Esta estructura es la que se necesita modificar si quieres aplicar algún filtro. Si no quieres filtrar no es necesario modificar la estructura.
+    let mut parametros = Parametros::new();
+
+    // Aquí se modifican los valores de los parámetros para aplicar algunos filtros. 
+    // En este caso se coloca el valor "7" en el campo "id_estatus_victima" el cual corresponde a "PERSONAS DESAPARECIDAS Y NO LOCALIZADAS". 
+    // También cambiamos el parámetro "titulo" y colocamos el título.
+    parametros.id_estatus_victima = "7".to_string();
+    parametros.titulo = "PERSONAS DESAPARECIDAS Y NO LOCALIZADAS".to_string();
+
+    // Por último, utilizamos la función de alto nivel "extraer_por_circunstancias" para obtener nuestros datos.
+    // La salida será una serie de archivos JSON, uno por cada opción en la variable a iterar, en este caso es la variable circunstancias
+    extractora::extraer_por_circunstancias(&parametros, &ruta_salida).unwrap();
+}
+~~~
+
+### Ejemplo de petición iterando sobre todas las variables
+
+Por último mostraremos el uso de la función de alto nivel que nos permite obtener la mayor cantidad de datos, sin embargo antes de que la ejecutes es importante que sepas que esta función hace un número grande de peticiones por lo cual tardará un tiempo largo en ejecutarse por completo. NO USES ESTA FUNCIÓN SOLAMENTE PARA PROBAR, USALA SOLAMENTE SI QUIERES TODOS LOS DATOS QUE GENERA. La función itera sobre todos los valores posibles de las variables con las cuales es posible filtrar en la plataforma del RNPDNO. La salida de esta función es una estructura de directorios en donde se encuentran los datos, por lo cual la ruta necesita ser un directorio. En este ejemplo también se muestra el uso de una función auxiliar que nos permite crear el directorio en donde se descargarán todos los datos. Para ejecutar este ejemplo necesitas modificar el archivo main.rs en la carpeta src y colocar lo siguiente: 
+
+~~~rust
+use reqrnpdno::{extractora,parameters::Parametros,utilidades};
+
+fn main () {
+
+    // Aquí se define la ruta en donde se guardarán los datos. En este caso es un directorio llamado "30-nov-2021" que aún no existe pero que crearemos en el directorio "salida". Para crearlo usamos la función de ayuda "crear_directorio()" para la cual el primer parámetro es la ruta objetivo y el segundo parámetro es el nombre del directorio a crear. 
+    let ruta_salida = utilidades::crear_directorio("./salida/", "30-nov-2021").unwrap();
+
+    // Aquí creamos la estructura de los parámetros necesarios para realizar la petición. Esta estructura es la que se necesita modificar si quieres aplicar algún filtro. Si no quieres filtrar no es necesario modificar la estructura.
+    let parametros = Parametros::new();
+
+    // Para este caso no modificaremos la estructura con los parametros. 
+
+    // Por último, utilizamos la función de alto nivel "extraer_todo_iterando" para obtener nuestros datos.
+    extractora::extraer_todo_iterando(&parametros, &ruta_salida).unwrap();
 
 }
 ~~~
