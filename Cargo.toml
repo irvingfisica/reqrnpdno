@@ -1,8 +1,16 @@
 [package]
 name = "reqrnpdno"
+license = "MIT"
 version = "0.1.0"
 authors = ["Irving Morales <irvingfisica@gmail.com>"]
+description = "Crate para consumir los datos públicos de desaparecidos en México"
+repository = "https://github.com/irvingfisica/reqrnpdno"
 edition = "2018"
+exclude = [
+    "salida/*",
+    "imagenes/*",
+    "datos_procesados/*",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
