@@ -1,3 +1,5 @@
+//! Módulo encargado de extraer los datos de la API. Las funciones de alto nivel para extraer datos se encuentran aquí.
+//! 
 use std::error::Error;
 use std::collections::BTreeMap;
 use reqwest::blocking::Client;
@@ -11,6 +13,11 @@ use std::fs::File;
 use std::fs;
 use std::io::Write;
 
+/// Función de alto nivel para obtener los diccionarios correspondientes a todos los catálogos. 
+///
+/// # Argumentos
+///
+/// * `ruta` - Ruta en donde se pretenden guardar los diccionarios, si la carpeta "diccionarios" no existe en la ruta será creada
 pub fn get_diccionarios(ruta: &str) -> Result<(), Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
@@ -92,7 +99,78 @@ pub fn get_diccionarios(ruta: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub fn extraer_por_estatus_victimas(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para realizar una petición de datos. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente. Esta función es la función principal con la cual se realizan peticiones simples. El módulo contiene otras funciones de alto nivel con las cuales es posible realizar iteraciones sobre los valores de una de las variables que conforman una búsqueda.
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos la cual incluya el nombre del archivo, la función creará un archivo JSON de salida llamado nacional.json
+pub fn extraer(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let params = parametros.clone();
+    let cliente = cliente::cliente_nuevo()?;
+
+    let salida = completa(&cliente, &params);
+
+    let rutam = ruta.to_string();
+
+    salida.exportar(&rutam)?;
+
+    Ok(())
+}
+
+
+/// Función de alto nivel para realizar una petición de datos que itera por sobre todos los valores de las variables que se pueden filtrar. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente. Mucho cuidado con esta función, realiza muchas peticiones pues su objetivo es obtener los datos en los niveles menores de desagregación. Su ejecución tardará muchísimo.
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos la cual incluya el nombre del archivo, la función creará un archivo JSON de salida llamado nacional.json
+pub fn extraer_todo_iterando(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut rutam = ruta.to_string();
+    rutam.push_str("/");
+    rutam.push_str("general.json");
+
+    extraer(&parametros, &rutam)?;
+    println!("Los datos generales han sido obtenidos");
+    let evcta = extraer_por_estatus_victimas(&parametros, &ruta)?;
+    println!("Los datos por estatus de victima han sido obtenidos. Se obtuvieron {} archivos", evcta);
+    let edcta = extraer_por_estados(&parametros, &ruta)?;
+    println!("Los datos por estado han sido obtenidos. Se obtuvieron {} archivos", edcta);
+    let mucta = extraer_por_municipios(&parametros, &ruta)?;
+    println!("Los datos por municipio han sido obtenidos. Se obtuvieron {} archivos", mucta);
+    let hicta = extraer_por_hipotesis(&parametros, &ruta)?;
+    println!("Los datos por hipótesis de desaparición han sido obtenidos. Se obtuvieron {} archivos", hicta);
+    let mecta = extraer_por_medios(&parametros, &ruta)?;
+    println!("Los datos por medio de conocimiento de la desaparición han sido obtenidos. Se obtuvieron {} archivos", mecta);
+    let decta = extraer_por_delitos(&parametros, &ruta)?;
+    println!("Los datos por delitos han sido obtenidos. Se obtuvieron {} archivos", decta);
+    let cicta = extraer_por_circunstancias(&parametros, &ruta)?;
+    println!("Los datos por circunstancias han sido obtenidos. Se obtuvieron {} archivos", cicta);
+    let dicta = extraer_por_discapacidades(&parametros, &ruta)?;
+    println!("Los datos por discapapcidad han sido obtenidos. Se obtuvieron {} archivos", dicta);
+    let etcta = extraer_por_etnias(&parametros, &ruta)?;
+    println!("Los datos por etnias han sido obtenidos. Se obtuvieron {} archivos", etcta);
+    let lecta = extraer_por_lenguas(&parametros, &ruta)?;
+    println!("Los datos por lengua han sido obtenidos. Se obtuvieron {} archivos", lecta);
+    let recta = extraer_por_religiones(&parametros, &ruta)?;
+    println!("Los datos por religión han sido obtenidos. Se obtuvieron {} archivos", recta);
+    let emcta = extraer_por_estatus_migratorio(&parametros, &ruta)?;
+    println!("Los datos por estatus migratorio han sido obtenidos. Se obtuvieron {} archivos", emcta);
+    extraer_por_categoria(&parametros, &ruta)?;
+    println!("Los datos generales han sido obtenidos");
+
+    Ok(())
+}
+
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de Estatus de víctimas. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "estatus_victimas" no existe en la ruta será creada
+pub fn extraer_por_estatus_victimas(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/estatus_victimas");
@@ -107,6 +185,7 @@ pub fn extraer_por_estatus_victimas(parametros: &Parametros, ruta: &str) -> Resu
 
     let estatus = parameters::get_estatus_victimas()?;
 
+    let mut cuenta = 0;
     for (titulo,dato) in estatus {
 
         let cliente = cliente::cliente_nuevo()?;
@@ -121,12 +200,20 @@ pub fn extraer_por_estatus_victimas(parametros: &Parametros, ruta: &str) -> Resu
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_estados(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de Estados. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente. En el campo espacial cada archivo tendrá los datos desagregados a nivel municipio.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "estados" no existe en la ruta será creada
+pub fn extraer_por_estados(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/estados");
@@ -142,6 +229,7 @@ pub fn extraer_por_estados(parametros: &Parametros, ruta: &str) -> Result<(), Bo
 
     let estados = parameters::get_estados(&cliente)?;
 
+    let mut cuenta = 0;
     for (_,dato) in estados {
 
         cliente = cliente::cliente_nuevo()?;
@@ -155,12 +243,20 @@ pub fn extraer_por_estados(parametros: &Parametros, ruta: &str) -> Result<(), Bo
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_municipios(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de Municipios. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente. Cuidado con esta función pues es una doble iteración, sobre los estados y sobre los municipios. Realiza muchas peticiones y tarda mucho en ejecutar. En el campo espacial cada archivo tendrá los datos desagregados a nivel colonia.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "municipios" no existe en la ruta será creada
+pub fn extraer_por_municipios(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/municipios");
@@ -175,6 +271,8 @@ pub fn extraer_por_municipios(parametros: &Parametros, ruta: &str) -> Result<(),
     let mut cliente = cliente::cliente_nuevo()?;
 
     let estados = parameters::get_estados(&cliente)?;
+
+    let mut cuenta = 0;
 
     for (_,dato) in estados {
 
@@ -198,15 +296,23 @@ pub fn extraer_por_municipios(parametros: &Parametros, ruta: &str) -> Result<(),
                     rutam.push_str(".json");
 
                     salida.exportar(&rutam)?;
+
+                    cuenta = cuenta + 1;
                 }
             }
         }
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_hipotesis(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de Hipótesis de desaparición. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "hipotesis" no existe en la ruta será creada
+pub fn extraer_por_hipotesis(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/hipotesis");
@@ -222,6 +328,8 @@ pub fn extraer_por_hipotesis(parametros: &Parametros, ruta: &str) -> Result<(), 
 
     let hipotesis = parameters::get_hipotesis(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in hipotesis {
 
         cliente = cliente::cliente_nuevo()?;
@@ -235,12 +343,20 @@ pub fn extraer_por_hipotesis(parametros: &Parametros, ruta: &str) -> Result<(), 
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_delitos(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de delitos. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "delitos" no existe en la ruta será creada
+pub fn extraer_por_delitos(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/delitos");
@@ -256,6 +372,8 @@ pub fn extraer_por_delitos(parametros: &Parametros, ruta: &str) -> Result<(), Bo
 
     let delitos = parameters::get_delitos(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in delitos {
 
         cliente = cliente::cliente_nuevo()?;
@@ -269,12 +387,20 @@ pub fn extraer_por_delitos(parametros: &Parametros, ruta: &str) -> Result<(), Bo
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_medios(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de medios por los cuales se dio a conocer la desaparición. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "medios" no existe en la ruta será creada
+pub fn extraer_por_medios(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/medios");
@@ -290,6 +416,8 @@ pub fn extraer_por_medios(parametros: &Parametros, ruta: &str) -> Result<(), Box
 
     let medios = parameters::get_medios(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in medios {
 
         cliente = cliente::cliente_nuevo()?;
@@ -303,12 +431,20 @@ pub fn extraer_por_medios(parametros: &Parametros, ruta: &str) -> Result<(), Box
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_circunstancias(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de circunstancias asociadas a la desaparición. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "circunstancias" no existe en la ruta será creada
+pub fn extraer_por_circunstancias(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/circunstancias");
@@ -324,6 +460,8 @@ pub fn extraer_por_circunstancias(parametros: &Parametros, ruta: &str) -> Result
 
     let circunstancias = parameters::get_circunstancias(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in circunstancias {
 
         cliente = cliente::cliente_nuevo()?;
@@ -337,12 +475,20 @@ pub fn extraer_por_circunstancias(parametros: &Parametros, ruta: &str) -> Result
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_discapacidades(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de discapapcidad. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "discapacidades" no existe en la ruta será creada
+pub fn extraer_por_discapacidades(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/discapacidades");
@@ -358,6 +504,8 @@ pub fn extraer_por_discapacidades(parametros: &Parametros, ruta: &str) -> Result
 
     let discapacidades = parameters::get_discapacidades(&cliente)?;
 
+    let mut cuenta  = 0;
+
     for (_,dato) in discapacidades {
 
         cliente = cliente::cliente_nuevo()?;
@@ -372,12 +520,20 @@ pub fn extraer_por_discapacidades(parametros: &Parametros, ruta: &str) -> Result
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_etnias(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de Etnia. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "etnias" no existe en la ruta será creada
+pub fn extraer_por_etnias(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/etnias");
@@ -393,6 +549,8 @@ pub fn extraer_por_etnias(parametros: &Parametros, ruta: &str) -> Result<(), Box
 
     let etnias = parameters::get_etnias(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in etnias {
 
         cliente = cliente::cliente_nuevo()?;
@@ -406,12 +564,20 @@ pub fn extraer_por_etnias(parametros: &Parametros, ruta: &str) -> Result<(), Box
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_lenguas(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de lenguas. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "lenguas" no existe en la ruta será creada
+pub fn extraer_por_lenguas(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/lenguas");
@@ -427,6 +593,8 @@ pub fn extraer_por_lenguas(parametros: &Parametros, ruta: &str) -> Result<(), Bo
 
     let lenguas = parameters::get_lenguas(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in lenguas {
 
         cliente = cliente::cliente_nuevo()?;
@@ -440,12 +608,20 @@ pub fn extraer_por_lenguas(parametros: &Parametros, ruta: &str) -> Result<(), Bo
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_religiones(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de religiones. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "religiones" no existe en la ruta será creada
+pub fn extraer_por_religiones(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/religiones");
@@ -461,6 +637,8 @@ pub fn extraer_por_religiones(parametros: &Parametros, ruta: &str) -> Result<(),
 
     let religiones = parameters::get_religiones(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in religiones {
 
         cliente = cliente::cliente_nuevo()?;
@@ -474,12 +652,20 @@ pub fn extraer_por_religiones(parametros: &Parametros, ruta: &str) -> Result<(),
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
-pub fn extraer_por_estatus_migratorio(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de Estatus migratorio. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "estatus_migratorio" no existe en la ruta será creada
+pub fn extraer_por_estatus_migratorio(parametros: &Parametros, ruta: &str) -> Result<i32, Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
     ruta_dir.push_str("/estatus_migratorio");
@@ -495,6 +681,8 @@ pub fn extraer_por_estatus_migratorio(parametros: &Parametros, ruta: &str) -> Re
 
     let emigratorios = parameters::get_emigratorios(&cliente)?;
 
+    let mut cuenta = 0;
+
     for (_,dato) in emigratorios {
 
         cliente = cliente::cliente_nuevo()?;
@@ -509,11 +697,19 @@ pub fn extraer_por_estatus_migratorio(parametros: &Parametros, ruta: &str) -> Re
 
         salida.exportar(&rutam)?;
 
+        cuenta = cuenta + 1;
+
     };
 
-    Ok(())
+    Ok(cuenta)
 }
 
+/// Función de alto nivel para obtener los datos de desaparecidos iterando sobre categorías de pertenencia del desaparecido. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos, si la carpeta "por_categoria" no existe en la ruta será creada
 pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
 
     let mut ruta_dir = ruta.to_string();
@@ -608,22 +804,12 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     Ok(())
 }
 
-pub fn extraer_nacional(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
-
-    let params = parametros.clone();
-    let cliente = cliente::cliente_nuevo()?;
-
-    let salida = completa(&cliente, &params);
-
-    let mut rutam = ruta.to_string();
-    rutam.push_str("/");
-    rutam.push_str("nacional.json");
-
-    salida.exportar(&rutam)?;
-
-    Ok(())
-}
-
+/// Función para realizar una petición al endpoint de datos totales filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn totales(cliente: &Client, parametros: &Parametros) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let url = urls::totales_url();
@@ -642,6 +828,12 @@ pub fn totales(cliente: &Client, parametros: &Parametros) -> Result<BTreeMap<Str
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por estado filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_estado(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::por_estado_url();
@@ -656,6 +848,12 @@ pub fn por_estado(cliente: &Client, parametros: &Parametros) -> Result<Data, Box
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por municipio filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_municipio(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::por_municipio_url();
@@ -670,6 +868,12 @@ pub fn por_municipio(cliente: &Client, parametros: &Parametros) -> Result<Data, 
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por colonia filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_colonia(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::por_colonia_url();
@@ -684,6 +888,12 @@ pub fn por_colonia(cliente: &Client, parametros: &Parametros) -> Result<Data, Bo
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por año filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_anio(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::por_anio_url();
@@ -698,6 +908,12 @@ pub fn por_anio(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<d
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por mes filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_mes(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::ultimo_anio_url();
@@ -712,6 +928,12 @@ pub fn por_mes(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dy
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por edad filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_rango_edad(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::rango_edad_url();
@@ -726,6 +948,12 @@ pub fn por_rango_edad(cliente: &Client, parametros: &Parametros) -> Result<Data,
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por nacionalidad filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_nacionalidad(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::nacionalidad_url();
@@ -740,6 +968,12 @@ pub fn por_nacionalidad(cliente: &Client, parametros: &Parametros) -> Result<Dat
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por fiscalias filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn fiscalias(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::fiscalias_url();
@@ -754,6 +988,12 @@ pub fn fiscalias(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por comisiones filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn comisiones(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::comisiones_url();
@@ -768,6 +1008,12 @@ pub fn comisiones(cliente: &Client, parametros: &Parametros) -> Result<Data, Box
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por portal filtrada conforme los valores de la estructura parametros. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn portal(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::portal_url();
@@ -782,6 +1028,12 @@ pub fn portal(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por edades filtrada conforme los valores de la estructura parametros. Los datos se extraen de las tablas generadas en el sitio del RNPDNO. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_edades_completo(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::tabla_detalle_url();
@@ -800,6 +1052,12 @@ pub fn por_edades_completo(cliente: &Client, parametros: &Parametros) -> Result<
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por nacionalidades filtrada conforme los valores de la estructura parametros. Los datos se extraen de las tablas generadas en el sitio del RNPDNO. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_nacionalidades_completo(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::tabla_detalle_url();
@@ -818,6 +1076,12 @@ pub fn por_nacionalidades_completo(cliente: &Client, parametros: &Parametros) ->
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por municipios filtrada conforme los valores de la estructura parametros. Los datos se extraen de las tablas generadas en el sitio del RNPDNO. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_municipios_completo(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::tabla_detalle_url();
@@ -836,6 +1100,12 @@ pub fn por_municipios_completo(cliente: &Client, parametros: &Parametros) -> Res
     Ok(datos)
 }
 
+/// Función para realizar una petición al endpoint de datos por colonias filtrada conforme los valores de la estructura parametros. Los datos se extraen de las tablas generadas en el sitio del RNPDNO. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn por_colonias_completo(cliente: &Client, parametros: &Parametros) -> Result<Data, Box<dyn Error>> {
 
     let url = urls::tabla_detalle_url();
@@ -854,6 +1124,12 @@ pub fn por_colonias_completo(cliente: &Client, parametros: &Parametros) -> Resul
     Ok(datos)
 }
 
+/// Función para realizar una petición a todos los endpoints disponibles. La solicitud es filtrada conforme los valores de la estructura parametros. Algunos de los datos se extraen de las tablas generadas en el sitio del RNPDNO. Esta función no es de alto nivel y solamente debería de ser usada si se quiere estructurar una petición particular de manera excepcional. La manera usual de pedir datos es utilizar las funciones de alto nivel proporcionadas en este mismo módulo. Si la petición particular se va a realizar de forma recurrente el mejor camino para hacerlo sería crear una función de alto nivel similar a las que se proporcionan en este módulo.
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente válido con el cual se realizarán las peticiones.
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
 pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
 
     let mut salida = General::new(parametros);
@@ -908,6 +1184,7 @@ pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
     salida
 }
 
+/// Función utilitaria para poder parsear las tablas del sitio del RNPDNO las cuales contienen los datos completos para algunas variables que no caben desagregadas en las gráficas.
 fn parse_table(tabla: &Tabla) -> Result<Data, Box<dyn Error>> {
 
     let mut cabeza: BTreeMap<usize,String> = BTreeMap::new();
@@ -960,6 +1237,7 @@ fn parse_table(tabla: &Tabla) -> Result<Data, Box<dyn Error>> {
     Ok(data)
 }
 
+/// Estructura utilitaria que contiene los datos parseados de una gráfica de la API
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct Data {
@@ -984,18 +1262,21 @@ impl Data {
     }
 }
 
+/// Estructura utilitaria que contiene los datos parseados de una de las series de una gráfica de la API
 #[derive(Deserialize, Debug)]
 pub struct Serie {
     pub name: String,
     pub data: Vec<u32>
 }
 
+/// Estructura utilitaria que contiene los datos parseados de una tabla de la API
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct Tabla {
     pub html: String,
 }
 
+/// Estructura utilitaria que contendrá los datos obtenidos de la API
 #[derive(Debug,Serialize)]
 pub struct General {
     pub totales: BTreeMap<String,String>,

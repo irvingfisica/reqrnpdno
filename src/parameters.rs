@@ -1,3 +1,6 @@
+//! Módulo encargado de generar la estructura con los parámetros necesarios y sus valores por defecto para realizar peticiones a la API que tengan sentido.
+//! El módulo también contiene las funciones necesaria para generar los diccionarios a partir de los catálogos internos de la API
+//! 
 use std::collections::BTreeMap;
 use std::error::Error;
 use serde::{Deserialize, Serialize};
@@ -5,7 +8,39 @@ use reqwest::blocking::Client;
 use crate::urls;
 use std::fs::File;
 use std::io::Write;
-  
+
+/// Estructura base para realizar las peticiones, contiene los campos necesarios para que la petición sea válida. Cada uno de los campos está asociado a un posible filtro en la petición. Los valores posibles para campo se pueden obtener de los diccionarios. Para generar los diccionarios es necesario usar la función 'get_diccionarios()' del módulo 'extractora'.
+/// Campos: 
+/// titulo: String - Valor interno para mostrar título en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "PERSONAS DESAPARECIDAS, NO LOCALIZADAS Y LOCALIZADAS"
+/// id_estatus_victima: String - Estatus de la víctima. Su valor por defecto es "0" correspondiente a "PERSONAS DESAPARECIDAS, NO LOCALIZADAS Y LOCALIZADAS"
+/// fecha_inicio: String - Fecha inicial para el filtro por fechas. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
+/// fecha_fin: String - Fecha final para el filtro por fechas. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
+/// id_estado: String - Estado. Su valor por defecto es "0", el cual corresponde a estraer datos para todos los estados
+/// id_municipio: String - Municipio. Su valor por defecto es "0", el cual corresponde a extraer datos para todos los municipios. La selección de un municipio debe de acompañar a la selección de un estado.
+/// mostrar_fecha_nula: String - Valor interno para mostrar fecha en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "0"
+/// id_colonia: String - Colonia. Su valor por defecto es "0", el cual corresponde a extraer datos para todas las colonias. La selección de una colonia debe de acompañar a la selección de un estado y de un municipio.
+/// id_nacionalidad: String - Nacionalidad. Su valor por defecto es "0", el cual corresponde a extraer datos para todas las nacionalidades.
+/// edad_inicio: String - Edad inicial para el filtro por edades. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
+/// edad_fin: String - Edad final para el filtro por edades. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
+/// mostrar_edad_nula: String - Valor interno para mostrar edad en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "0"
+/// id_hipotesis: String - Actualmente no sabemos a que filtro está asociado este valor. Si se buscan datos filtrados por hipótesis de desaparición el campo a utilizar es "id_hipotesis_no_localizacion"
+/// id_medio_conocimiento: String - Medio de conocimiento de la desaparición. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
+/// id_circunstancia: String - Circunstancia de la desaparición. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
+/// tiene_discapacidad: String - Discapacidad existente. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
+/// id_tipo_discapacidad: String - Tipo de discapapcidad. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles. Si se desea obtener datos por discapacidad es necesario modificar el campo "tiene_discapacidad" a un valor válido y diferente del valor por defecto
+/// id_etnia: String - Etnia. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
+/// id_lengua: String - Lengua, Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
+/// id_religion: String - Religión. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
+/// es_migrante: String - Condición de migrante existente. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
+/// id_estatus_migratorio: String - Estatus migratorio. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles. Si se desea obtener datos por estatus migratorio es necesario modificar el campo "es_migrante" a un valor válido y diferente del valor por defecto
+/// es_lgbttti: String - Condición de pertenencia a comunidad lgbttti. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
+/// es_servidor_publico: String - Condición de servidor público. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
+/// es_defensor_dh: String  - Condición de defensor de derechos humanos. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
+/// es_periodista: String - Condición de pertenencia al gremio periodista. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
+/// es_sindicalista: String - Condición de pertenencia al gremio sindicalista. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
+/// es_ong: String - Condición de pertenencia a una ONG. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
+/// id_hipotesis_no_localizacion:String - Hipótesis de desaparición. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
+/// id_delito: String - Delito asociado a la desparición. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
 #[derive(Debug, Clone, Serialize)]
 pub struct Parametros {
     pub titulo: String,
@@ -40,6 +75,7 @@ pub struct Parametros {
     pub id_delito: String
 } 
 
+/// Genera una instancia nueva de la estructura de parámetros, los valores para campo pueden cambiarse de forma manual y así modificar los filtros utilizados en la petición.
 impl Parametros {
     pub fn new() -> Parametros {
         Parametros {
@@ -76,6 +112,7 @@ impl Parametros {
         }
     }
 
+    /// Genera tuplas con los valores de los parámetros.
     pub fn to_tuples(&self) -> Vec<(&str,&str)>{
         vec![
             ("titulo",&self.titulo),
@@ -111,6 +148,12 @@ impl Parametros {
     }
 }
 
+/// Función utilitaria para escribir los diccionarios en archivos
+///
+/// # Argumentos
+///
+/// * `categorias` - Mapa con las categorías y sus valores asociados.
+/// * `cola` - ruta del archivo en el cual se escribirá el diccionario
 pub fn exportar_categorias(categorias: &BTreeMap<String,String>, ruta: &str) -> Result<(), Box<dyn Error>> {
         
     let mut salida = File::create(ruta)?;
@@ -120,6 +163,8 @@ pub fn exportar_categorias(categorias: &BTreeMap<String,String>, ruta: &str) -> 
     Ok(())
 }
 
+
+/// Función para obtener el catálogo de estatus de víctimas
 pub fn get_estatus_victimas() -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -136,6 +181,11 @@ pub fn get_estatus_victimas() -> Result<BTreeMap<String,String>, Box<dyn Error>>
 
 }
 
+/// Función para obtener el catálogo de estados
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_estados(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -160,6 +210,11 @@ pub fn get_estados(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn 
     
 }
 
+/// Función para obtener el catálogo espacial, de todos los estados, municipios y colonias, anidados. Esta función es iterativa y tarda mucho en ejecutarse pues hace muchas peticiones a la API. Cuidado al usarla. Una vez generado el catálogo puede exportarse como un diccionario y sacarse a un archivo con la función "exportar_espacial()"
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
 
     let mut edovec: Vec<Estado> = Vec::new();
@@ -252,6 +307,12 @@ pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
     Ok(edovec)
 }
 
+/// Función para exportar a un archivo el catálogo espacial anidado generado por la función "get_all_espacial()"
+///
+/// # Argumentos
+///
+/// * `espacial` - estructura que alberga el catálogo espacial anidado
+/// * `ruta` - ruta del archivo al que se exportará el catálogo
 pub fn exportar_espacial(espacial: &Vec<Estado>, ruta: &str) -> Result<(), Box<dyn Error>> {
         
     let mut salida = File::create(ruta)?;
@@ -261,6 +322,7 @@ pub fn exportar_espacial(espacial: &Vec<Estado>, ruta: &str) -> Result<(), Box<d
     Ok(())
 }
 
+/// Estructura utilitaria para almacenar los datos de una colonia
 #[derive(Deserialize, Serialize, Debug)]
 struct Colonia {
     text: String,
@@ -268,6 +330,7 @@ struct Colonia {
     value: String, 
 }
 
+/// Estructura utilitaria para almacenar los datos de un municipio
 #[derive(Deserialize, Serialize, Debug)]
 struct Municipio {
     text: String,
@@ -276,6 +339,7 @@ struct Municipio {
     subunidades: Vec<Colonia>
 }
 
+/// Estructura utilitaria para almacenar los datos de un estado
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Estado {
     text: String,
@@ -284,6 +348,12 @@ pub struct Estado {
     subunidades: Vec<Municipio>
 }
 
+/// Función para obtener el catálogo de municipios correspondiente a un estado. El estado debe ser un valor válido en los catálogos de estados de la API
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
+/// * `estado` - estado del cual se desean los municipios
 pub fn get_municipios(cliente: &Client, estado: &str) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -308,6 +378,13 @@ pub fn get_municipios(cliente: &Client, estado: &str) -> Result<BTreeMap<String,
     Ok(mapa)
 }
 
+/// Función para obtener el catálogo de colonias correspondiente a un municipio correspondiente a un estado. El estado y el municipio deben ser valores válidos en los catálogos de estados y de minucipios de la API
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
+/// * `estado` - estado del cual se desean los municipios
+/// * `municipio` - municipio del cual se desean las colonias
 pub fn get_colonias(cliente: &Client, estado: &str, municipio: &str) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -332,6 +409,11 @@ pub fn get_colonias(cliente: &Client, estado: &str, municipio: &str) -> Result<B
     Ok(mapa)
 }
 
+/// Función para obtener el catálogo de nacionalidades
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_nacionalidades(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -356,6 +438,11 @@ pub fn get_nacionalidades(cliente: &Client) -> Result<BTreeMap<String,String>, B
     
 }
 
+/// Función para obtener el catálogo de hipótesis de la desaparición
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_hipotesis(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -380,6 +467,11 @@ pub fn get_hipotesis(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dy
     
 }
 
+/// Función para obtener el catálogo de delitos asociados a la desaparición
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_delitos(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -404,6 +496,11 @@ pub fn get_delitos(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn 
     
 }
 
+/// Función para obtener el catálogo de medios por los que se dio a conocer la desaparición
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_medios(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -428,6 +525,11 @@ pub fn get_medios(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn E
     
 }
 
+/// Función para obtener el catálogo de circunstancias en las que se dió la desaparición
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_circunstancias(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -452,6 +554,11 @@ pub fn get_circunstancias(cliente: &Client) -> Result<BTreeMap<String,String>, B
     
 }
 
+/// Función para obtener el catálogo de discapacidades
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_discapacidades(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -476,6 +583,11 @@ pub fn get_discapacidades(cliente: &Client) -> Result<BTreeMap<String,String>, B
     
 }
 
+/// Función para obtener el catálogo de etnias
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_etnias(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -500,6 +612,11 @@ pub fn get_etnias(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn E
     
 }
 
+/// Función para obtener el catálogo de lenguas
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_lenguas(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -524,6 +641,11 @@ pub fn get_lenguas(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn 
     
 }
 
+/// Función para obtener el catálogo de religiones
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_religiones(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -548,6 +670,11 @@ pub fn get_religiones(cliente: &Client) -> Result<BTreeMap<String,String>, Box<d
     
 }
 
+/// Función para obtener el catálogo de estatus migratorios
+///
+/// # Argumentos
+///
+/// * `cliente` - Cliente a usar para extraer el catálogo
 pub fn get_emigratorios(cliente: &Client) -> Result<BTreeMap<String,String>, Box<dyn Error>> {
 
     let mut mapa = BTreeMap::new();
@@ -572,6 +699,7 @@ pub fn get_emigratorios(cliente: &Client) -> Result<BTreeMap<String,String>, Box
     
 }
 
+/// Estructura utilitaria para escribir los diccionarios a archivos
 #[derive(Deserialize,Debug)]
 #[serde(rename_all = "PascalCase")]
 struct OptionSelect {
