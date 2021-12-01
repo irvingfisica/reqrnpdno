@@ -1,5 +1,9 @@
 # Crate para consumir los datos públicos de desaparecidos en México
 
+[![CratesIo](https://img.shields.io/crates/v/reqrnpdno.svg)](https://crates.io/crates/reqrnpdno) [![Documentacion](https://docs.rs/reqrnpdno/badge.svg)](https://docs.rs/reqrnpdno/)
+
+La documentación de todas las funciones la encuentras [aquí](https://docs.rs/reqrnpdno/). Si tienes alguna duda de como usar el crate después de haber leído esta introducción y los ejemplos no dudes en echarme un mensaje por twitter a [@moaimx](https://twitter.com/moaimx)
+
 El crate contiene funciones para poder consumir los datos de la [Versión Pública RNPDNO](https://versionpublicarnpdno.segob.gob.mx/Dashboard/Index).
 
 Los datos de desaparecidos en México son públcios, sin embargo la única manera de consumirlos es a través de un sitio web en el cual se pueden introducir filtros y obtener los valores en la base de datos que satisfacen los filtros. Además la web no tiene un acceso a los datos, solo realiza algunas gráficas a partir de los datos obtenidos. Esto hace que el obtener información sea un proceso repetitivo y complejo, además el sitio está protegido por un Captcha que hace más lento el proceso de realizar peticiones a la base de datos. 
@@ -43,9 +47,33 @@ Para el resto de las acciones el procedimiento es el mismo:
 
 Para ejecutar los siguientes ejemplos es necesario instalar Rust en tu máquina siguiendo estas [instrucciones](https://www.rust-lang.org/tools/install). 
 
-Después necesitas descargar este repositorio. Si abres el archivo main.rs en el directorio src podrás ver el primer ejemplo. Para poder ejecutarlo necesitas en tu terminal entrar a la carpeta del proyecto, compilar y ejecutar el archivo a través de la instrucción "cargo run --release".
+Una vez que instalaste Rust hay dos maneras de usar el crate.
 
-Si quieres probar ejemplos más complejos tendrás que cambiar el contenido del archivo main.rs por el del nuevo ejemplo o por el de tu código
+La primera es descargando este repositorio. Una vez que lo descargues tienes que entrar al directorio donde se encuentran todos los archivos y en un editor de código como [VSCode](https://code.visualstudio.com/) abrir el archivo main.rs en el directorio src podrás. Al abrirlo notarás que tiene el código del primer ejemplo. Para poder ejecutarlo necesitas en tu terminal entrar a la carpeta del proyecto, compilar y ejecutar el archivo a través de la instrucción "cargo run --release". Al teclear esta instrucción y dar enter se ejecutará el ejemplo. Despues de que ejecute deberás ver el archivo con los datos descargados desde la plataforma del RNPDNO.
+
+Si quieres probar ejemplos más complejos tendrás que cambiar el contenido del archivo main.rs por el del nuevo ejemplo o por el de tu código propio.
+
+La segunda manera es utilizando este crate como crate desde los repositorios de Rust, de esta manera no es necesario descargar nada de este repositorio. Para ello tendras que crear un nuevo proyecto usando cargo. En tu terminal, en la carpeta donde quieras crearlo, ejecuta la instrucción "cargo new nombre_del_proyecto" donde sustituyes nombre_del_proyecto por el nombre que quieras. Luego tendrás que entrar a la carpeta que acaba de crear cargo. Lo puedes hacer con "cd nombre_del_proyecto".
+
+Una vez que estes dentro de la carpeta de tu proyecto necesitas abrir el archivo Cargo.toml y en la sección de "dependencies" agregar la linea:
+
+reqrnpdno = "0.1"
+
+basta con que la pongas debajo. Tu archivo debe verse similar a esto:
+
+~~~toml
+[package]
+name = "nombre_del_proyecto"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+reqrnpdno = "0.1"
+~~~
+
+Ahora, en el archivo main.src debes sustituir el contenido por el contenido del primer ejemplo. Para poder ejecutarlo necesitas en tu terminal entrar a la carpeta del proyecto, compilar y ejecutar el archivo a través de la instrucción "cargo run --release". Al teclear esta instrucción y dar enter se ejecutará el ejemplo. Despues de que ejecute deberás ver el archivo con los datos descargados desde la plataforma del RNPDNO.
+
+Si quieres probar ejemplos más complejos tendrás que cambiar el contenido del archivo main.rs por el del nuevo ejemplo o por el de tu código propio.
 
 ### Ejemplo de petición simple
 
