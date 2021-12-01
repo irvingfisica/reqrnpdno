@@ -10,68 +10,67 @@ use std::fs::File;
 use std::io::Write;
 
 /// Estructura base para realizar las peticiones, contiene los campos necesarios para que la petición sea válida. Cada uno de los campos está asociado a un posible filtro en la petición. Los valores posibles para campo se pueden obtener de los diccionarios. Para generar los diccionarios es necesario usar la función 'get_diccionarios()' del módulo 'extractora'.
-/// Campos: 
-/// titulo: String - Valor interno para mostrar título en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "PERSONAS DESAPARECIDAS, NO LOCALIZADAS Y LOCALIZADAS"
-/// id_estatus_victima: String - Estatus de la víctima. Su valor por defecto es "0" correspondiente a "PERSONAS DESAPARECIDAS, NO LOCALIZADAS Y LOCALIZADAS"
-/// fecha_inicio: String - Fecha inicial para el filtro por fechas. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
-/// fecha_fin: String - Fecha final para el filtro por fechas. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
-/// id_estado: String - Estado. Su valor por defecto es "0", el cual corresponde a estraer datos para todos los estados
-/// id_municipio: String - Municipio. Su valor por defecto es "0", el cual corresponde a extraer datos para todos los municipios. La selección de un municipio debe de acompañar a la selección de un estado.
-/// mostrar_fecha_nula: String - Valor interno para mostrar fecha en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "0"
-/// id_colonia: String - Colonia. Su valor por defecto es "0", el cual corresponde a extraer datos para todas las colonias. La selección de una colonia debe de acompañar a la selección de un estado y de un municipio.
-/// id_nacionalidad: String - Nacionalidad. Su valor por defecto es "0", el cual corresponde a extraer datos para todas las nacionalidades.
-/// edad_inicio: String - Edad inicial para el filtro por edades. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
-/// edad_fin: String - Edad final para el filtro por edades. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
-/// mostrar_edad_nula: String - Valor interno para mostrar edad en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "0"
-/// id_hipotesis: String - Actualmente no sabemos a que filtro está asociado este valor. Si se buscan datos filtrados por hipótesis de desaparición el campo a utilizar es "id_hipotesis_no_localizacion"
-/// id_medio_conocimiento: String - Medio de conocimiento de la desaparición. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
-/// id_circunstancia: String - Circunstancia de la desaparición. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
-/// tiene_discapacidad: String - Discapacidad existente. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
-/// id_tipo_discapacidad: String - Tipo de discapapcidad. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles. Si se desea obtener datos por discapacidad es necesario modificar el campo "tiene_discapacidad" a un valor válido y diferente del valor por defecto
-/// id_etnia: String - Etnia. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
-/// id_lengua: String - Lengua, Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
-/// id_religion: String - Religión. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
-/// es_migrante: String - Condición de migrante existente. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
-/// id_estatus_migratorio: String - Estatus migratorio. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles. Si se desea obtener datos por estatus migratorio es necesario modificar el campo "es_migrante" a un valor válido y diferente del valor por defecto
-/// es_lgbttti: String - Condición de pertenencia a comunidad lgbttti. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
-/// es_servidor_publico: String - Condición de servidor público. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
-/// es_defensor_dh: String  - Condición de defensor de derechos humanos. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
-/// es_periodista: String - Condición de pertenencia al gremio periodista. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
-/// es_sindicalista: String - Condición de pertenencia al gremio sindicalista. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
-/// es_ong: String - Condición de pertenencia a una ONG. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
-/// id_hipotesis_no_localizacion:String - Hipótesis de desaparición. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
-/// id_delito: String - Delito asociado a la desparición. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
 #[derive(Debug, Clone, Serialize)]
 pub struct Parametros {
+    // titulo: String - Valor interno para mostrar título en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "PERSONAS DESAPARECIDAS, NO LOCALIZADAS Y LOCALIZADAS"
     pub titulo: String,
+    // id_estatus_victima: String - Estatus de la víctima. Su valor por defecto es "0" correspondiente a "PERSONAS DESAPARECIDAS, NO LOCALIZADAS Y LOCALIZADAS"
     pub id_estatus_victima: String,
+    // fecha_inicio: String - Fecha inicial para el filtro por fechas. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
     pub fecha_inicio: String,
+    // fecha_fin: String - Fecha final para el filtro por fechas. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
     pub fecha_fin: String,
+    // id_estado: String - Estado. Su valor por defecto es "0", el cual corresponde a estraer datos para todos los estados
     pub id_estado: String,
+    // id_municipio: String - Municipio. Su valor por defecto es "0", el cual corresponde a extraer datos para todos los municipios. La selección de un municipio debe de acompañar a la selección de un estado.
     pub id_municipio: String,
+    // mostrar_fecha_nula: String - Valor interno para mostrar fecha en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "0"
     pub mostrar_fecha_nula: String,
+    // id_colonia: String - Colonia. Su valor por defecto es "0", el cual corresponde a extraer datos para todas las colonias. La selección de una colonia debe de acompañar a la selección de un estado y de un municipio.
     pub id_colonia: String,
+    // id_nacionalidad: String - Nacionalidad. Su valor por defecto es "0", el cual corresponde a extraer datos para todas las nacionalidades.
     pub id_nacionalidad: String,
+    // edad_inicio: String - Edad inicial para el filtro por edades. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
     pub edad_inicio: String,
+    // edad_fin: String - Edad final para el filtro por edades. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
     pub edad_fin: String,
+    // mostrar_edad_nula: String - Valor interno para mostrar edad en la página de datos, su valor no afecta los datos obtenidos. Su valor por defecto es "0"
     pub mostrar_edad_nula: String,
+    // id_hipotesis: String - Actualmente no sabemos a que filtro está asociado este valor. Si se buscan datos filtrados por hipótesis de desaparición el campo a utilizar es "id_hipotesis_no_localizacion"
     pub id_hipotesis: String,
+    // id_medio_conocimiento: String - Medio de conocimiento de la desaparición. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
     pub id_medio_conocimiento: String,
+    // id_circunstancia: String - Circunstancia de la desaparición. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
     pub id_circunstancia: String,
+    // tiene_discapacidad: String - Discapacidad existente. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles 
     pub tiene_discapacidad: String, 
+    // id_tipo_discapacidad: String - Tipo de discapapcidad. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles. Si se desea obtener datos por discapacidad es necesario modificar el campo "tiene_discapacidad" a un valor válido y diferente del valor por defecto
     pub id_tipo_discapacidad: String,
+    // id_etnia: String - Etnia. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
     pub id_etnia: String,
+    // id_lengua: String - Lengua, Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
     pub id_lengua: String,
+    // id_religion: String - Religión. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles
     pub id_religion: String,
+    // es_migrante: String - Condición de migrante existente. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
     pub es_migrante: String,
+    // id_estatus_migratorio: String - Estatus migratorio. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles. Si se desea obtener datos por estatus migratorio es necesario modificar el campo "es_migrante" a un valor válido y diferente del valor por defecto
     pub id_estatus_migratorio: String,
+    // es_lgbttti: String - Condición de pertenencia a comunidad lgbttti. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
     pub es_lgbttti: String,
+    // es_servidor_publico: String - Condición de servidor público. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
     pub es_servidor_publico: String,
+    // es_defensor_dh: String  - Condición de defensor de derechos humanos. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
     pub es_defensor_dh: String,
+    // es_periodista: String - Condición de pertenencia al gremio periodista. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
     pub es_periodista: String,
+    // es_sindicalista: String - Condición de pertenencia al gremio sindicalista. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
     pub es_sindicalista: String,
+    // es_ong: String - Condición de pertenencia a una ONG. Su valor por defecto es "" lo cual corresponde a extraer todos los datos disponibles.
     pub es_ong: String,
+    // id_hipotesis_no_localizacion:String - Hipótesis de desaparición. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
     pub id_hipotesis_no_localizacion:String,
+    // id_delito: String - Delito asociado a la desparición. Su valor por defecto es "0" lo cual corresponde a extraer todos los datos disponibles
     pub id_delito: String
 } 
 
