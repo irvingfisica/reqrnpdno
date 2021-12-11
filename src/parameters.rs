@@ -264,7 +264,7 @@ pub fn get_all_espacial(cliente: &Client) -> Result<Vec<Estado>,Box<dyn Error>>{
                                 let col_value = colonia.value.to_string();
                                 let col_text = colonia.text.to_string();
                                 let mut col_clave = mun_clave.to_string();
-                                col_clave.push_str("-");
+                                col_clave.push('-');
                                 col_clave.push_str(&col_value);
                                 match col_value.as_str() {
                                     "0" => {},
