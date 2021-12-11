@@ -125,69 +125,69 @@ pub fn extraer(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>
 /// * `ruta` - Ruta en donde se pretenden guardar los datos la cual incluya el nombre del archivo, la función creará un archivo JSON de salida llamado nacional.json
 pub fn extraer_todo_iterando(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
     let mut rutam = ruta.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str("general.json");
 
-    extraer(&parametros, &rutam)?;
+    extraer(parametros, &rutam)?;
     println!("Los datos generales han sido obtenidos");
-    let evcta = extraer_por_estatus_victimas(&parametros, &ruta)?;
+    let evcta = extraer_por_estatus_victimas(parametros, ruta)?;
     println!(
         "Los datos por estatus de victima han sido obtenidos. Se obtuvieron {} archivos",
         evcta
     );
-    let edcta = extraer_por_estados(&parametros, &ruta)?;
+    let edcta = extraer_por_estados(parametros, ruta)?;
     println!(
         "Los datos por estado han sido obtenidos. Se obtuvieron {} archivos",
         edcta
     );
-    let mucta = extraer_por_municipios(&parametros, &ruta)?;
+    let mucta = extraer_por_municipios(parametros, ruta)?;
     println!(
         "Los datos por municipio han sido obtenidos. Se obtuvieron {} archivos",
         mucta
     );
-    let hicta = extraer_por_hipotesis(&parametros, &ruta)?;
+    let hicta = extraer_por_hipotesis(parametros, ruta)?;
     println!(
         "Los datos por hipótesis de desaparición han sido obtenidos. Se obtuvieron {} archivos",
         hicta
     );
-    let mecta = extraer_por_medios(&parametros, &ruta)?;
+    let mecta = extraer_por_medios(parametros, ruta)?;
     println!("Los datos por medio de conocimiento de la desaparición han sido obtenidos. Se obtuvieron {} archivos", mecta);
-    let decta = extraer_por_delitos(&parametros, &ruta)?;
+    let decta = extraer_por_delitos(parametros, ruta)?;
     println!(
         "Los datos por delitos han sido obtenidos. Se obtuvieron {} archivos",
         decta
     );
-    let cicta = extraer_por_circunstancias(&parametros, &ruta)?;
+    let cicta = extraer_por_circunstancias(parametros, ruta)?;
     println!(
         "Los datos por circunstancias han sido obtenidos. Se obtuvieron {} archivos",
         cicta
     );
-    let dicta = extraer_por_discapacidades(&parametros, &ruta)?;
+    let dicta = extraer_por_discapacidades(parametros, ruta)?;
     println!(
         "Los datos por discapapcidad han sido obtenidos. Se obtuvieron {} archivos",
         dicta
     );
-    let etcta = extraer_por_etnias(&parametros, &ruta)?;
+    let etcta = extraer_por_etnias(parametros, ruta)?;
     println!(
         "Los datos por etnias han sido obtenidos. Se obtuvieron {} archivos",
         etcta
     );
-    let lecta = extraer_por_lenguas(&parametros, &ruta)?;
+    let lecta = extraer_por_lenguas(parametros, ruta)?;
     println!(
         "Los datos por lengua han sido obtenidos. Se obtuvieron {} archivos",
         lecta
     );
-    let recta = extraer_por_religiones(&parametros, &ruta)?;
+    let recta = extraer_por_religiones(parametros, ruta)?;
     println!(
         "Los datos por religión han sido obtenidos. Se obtuvieron {} archivos",
         recta
     );
-    let emcta = extraer_por_estatus_migratorio(&parametros, &ruta)?;
+    let emcta = extraer_por_estatus_migratorio(parametros, ruta)?;
     println!(
         "Los datos por estatus migratorio han sido obtenidos. Se obtuvieron {} archivos",
         emcta
     );
-    extraer_por_categoria(&parametros, &ruta)?;
+    extraer_por_categoria(parametros, ruta)?;
     println!("Los datos generales han sido obtenidos");
 
     Ok(())
@@ -224,13 +224,13 @@ pub fn extraer_por_estatus_victimas(
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -264,13 +264,13 @@ pub fn extraer_por_estados(parametros: &Parametros, ruta: &str) -> Result<i32, B
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -313,15 +313,15 @@ pub fn extraer_por_municipios(parametros: &Parametros, ruta: &str) -> Result<i32
                     let salida = completa(&cliente, &params);
 
                     let mut rutam = ruta_dir.to_string();
-                    rutam.push_str("/");
+                    rutam.push('/');
                     rutam.push_str(&dato);
-                    rutam.push_str("_");
+                    rutam.push('_');
                     rutam.push_str(&mdato);
                     rutam.push_str(".json");
 
                     salida.exportar(&rutam)?;
 
-                    cuenta = cuenta + 1;
+                    cuenta += 1;
                 }
             }
         }
@@ -359,13 +359,13 @@ pub fn extraer_por_hipotesis(parametros: &Parametros, ruta: &str) -> Result<i32,
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -400,13 +400,13 @@ pub fn extraer_por_delitos(parametros: &Parametros, ruta: &str) -> Result<i32, B
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -441,13 +441,13 @@ pub fn extraer_por_medios(parametros: &Parametros, ruta: &str) -> Result<i32, Bo
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -485,13 +485,13 @@ pub fn extraer_por_circunstancias(
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -530,13 +530,13 @@ pub fn extraer_por_discapacidades(
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -571,13 +571,13 @@ pub fn extraer_por_etnias(parametros: &Parametros, ruta: &str) -> Result<i32, Bo
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -612,13 +612,13 @@ pub fn extraer_por_lenguas(parametros: &Parametros, ruta: &str) -> Result<i32, B
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -653,13 +653,13 @@ pub fn extraer_por_religiones(parametros: &Parametros, ruta: &str) -> Result<i32
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -698,13 +698,13 @@ pub fn extraer_por_estatus_migratorio(
         let salida = completa(&cliente, &params);
 
         let mut rutam = ruta_dir.to_string();
-        rutam.push_str("/");
+        rutam.push('/');
         rutam.push_str(&dato);
         rutam.push_str(".json");
 
         salida.exportar(&rutam)?;
 
-        cuenta = cuenta + 1;
+        cuenta += 1;
     }
 
     Ok(cuenta)
@@ -734,7 +734,7 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     cliente = cliente::cliente_nuevo()?;
     let salida = completa(&cliente, &params);
     let mut rutam = ruta_dir.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str(categoria);
     rutam.push_str(".json");
     salida.exportar(&rutam)?;
@@ -745,7 +745,7 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     cliente = cliente::cliente_nuevo()?;
     let salida = completa(&cliente, &params);
     let mut rutam = ruta_dir.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str(categoria);
     rutam.push_str(".json");
     salida.exportar(&rutam)?;
@@ -756,7 +756,7 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     cliente = cliente::cliente_nuevo()?;
     let salida = completa(&cliente, &params);
     let mut rutam = ruta_dir.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str(categoria);
     rutam.push_str(".json");
     salida.exportar(&rutam)?;
@@ -767,7 +767,7 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     cliente = cliente::cliente_nuevo()?;
     let salida = completa(&cliente, &params);
     let mut rutam = ruta_dir.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str(categoria);
     rutam.push_str(".json");
     salida.exportar(&rutam)?;
@@ -778,7 +778,7 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     cliente = cliente::cliente_nuevo()?;
     let salida = completa(&cliente, &params);
     let mut rutam = ruta_dir.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str(categoria);
     rutam.push_str(".json");
     salida.exportar(&rutam)?;
@@ -789,7 +789,7 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     cliente = cliente::cliente_nuevo()?;
     let salida = completa(&cliente, &params);
     let mut rutam = ruta_dir.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str(categoria);
     rutam.push_str(".json");
     salida.exportar(&rutam)?;
@@ -800,7 +800,7 @@ pub fn extraer_por_categoria(parametros: &Parametros, ruta: &str) -> Result<(), 
     cliente = cliente::cliente_nuevo()?;
     let salida = completa(&cliente, &params);
     let mut rutam = ruta_dir.to_string();
-    rutam.push_str("/");
+    rutam.push('/');
     rutam.push_str(categoria);
     rutam.push_str(".json");
     salida.exportar(&rutam)?;
@@ -1213,7 +1213,7 @@ pub fn por_colonias_completo(
 pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
     let mut salida = General::new(parametros);
 
-    match totales(&cliente, &parametros) {
+    match totales(cliente, parametros) {
         Ok(datos) => salida.totales = datos,
         Err(err) => {
             println!("No se pudieron obtener los totales - {}", err)
@@ -1226,7 +1226,7 @@ pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
         parametros.id_colonia.as_str(),
     ) {
         ("0", "0", "0") => {
-            match por_estado(&cliente, &parametros) {
+            match por_estado(cliente, parametros) {
                 Ok(datos) => salida.espacial = datos.to_map(),
                 Err(err) => {
                     println!("No se pudo obtener la información espacial - {}", err)
@@ -1234,7 +1234,7 @@ pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
             };
         }
         (_, "0", "0") => {
-            match por_municipios_completo(&cliente, &parametros) {
+            match por_municipios_completo(cliente, parametros) {
                 Ok(datos) => salida.espacial = datos.to_map(),
                 Err(err) => {
                     println!("No se pudo obtener la información espacial - {}", err)
@@ -1242,7 +1242,7 @@ pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
             };
         }
         (_, _, "0") => {
-            match por_colonias_completo(&cliente, &parametros) {
+            match por_colonias_completo(cliente, parametros) {
                 Ok(datos) => salida.espacial = datos.to_map(),
                 Err(err) => {
                     println!("No se pudo obtener la información espacial - {}", err)
@@ -1252,28 +1252,28 @@ pub fn completa(cliente: &Client, parametros: &Parametros) -> General {
         (_, _, _) => {}
     };
 
-    match por_anio(&cliente, &parametros) {
+    match por_anio(cliente, parametros) {
         Ok(datos) => salida.anual = datos.to_map(),
         Err(err) => {
             println!("No se pudo obtener la información anual - {}", err)
         }
     };
 
-    match por_mes(&cliente, &parametros) {
+    match por_mes(cliente, parametros) {
         Ok(datos) => salida.mensual_ultimo_anio = datos.to_map(),
         Err(err) => {
             println!("No se pudo obtener la información mensual - {}", err)
         }
     };
 
-    match por_edades_completo(&cliente, &parametros) {
+    match por_edades_completo(cliente, parametros) {
         Ok(datos) => salida.por_edad = datos.to_map(),
         Err(err) => {
             println!("No se pudo obtener la información por edades - {}", err)
         }
     };
 
-    match por_nacionalidades_completo(&cliente, &parametros) {
+    match por_nacionalidades_completo(cliente, parametros) {
         Ok(datos) => salida.por_nacionalidad = datos.to_map(),
         Err(err) => {
             println!(
@@ -1339,7 +1339,7 @@ fn parse_table(tabla: &Tabla) -> Result<Data, Box<dyn Error>> {
                         .iter()
                         .map(|val| val.parse::<u32>().unwrap())
                         .collect(),
-                    name: cabeza.get(&llave).unwrap().clone(),
+                    name: cabeza.get(llave).unwrap().clone(),
                 };
                 series.push(serie);
             }
@@ -1370,7 +1370,7 @@ impl Data {
             let llave = serie.name.clone();
             let mut minimapa: BTreeMap<String, u32> = BTreeMap::new();
             for (catego, valor) in self.x_axis_categories.iter().zip(serie.data.iter()) {
-                minimapa.insert(catego.clone(), valor.clone());
+                minimapa.insert(catego.clone(), *valor);
             }
             mapa.insert(llave, minimapa);
         }
