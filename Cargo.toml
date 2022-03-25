@@ -1,7 +1,7 @@
 [package]
 name = "reqrnpdno"
 license = "MIT"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Irving Morales <irvingfisica@gmail.com>"]
 description = "Crate para consumir los datos públicos de desaparecidos en México"
 repository = "https://github.com/irvingfisica/reqrnpdno"
