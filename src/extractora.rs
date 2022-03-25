@@ -182,8 +182,6 @@ pub fn extraer_todo_iterando_municipal(parametros: &Parametros, ruta: &str) -> R
     println!("Los datos por estatus de victima han sido obtenidos. Se obtuvieron {} archivos", evcta);
     let edcta = extraer_por_estados(&parametros, &ruta)?;
     println!("Los datos por estado han sido obtenidos. Se obtuvieron {} archivos", edcta);
-    let mucta = extraer_por_municipios(&parametros, &ruta)?;
-    println!("Los datos por municipio han sido obtenidos. Se obtuvieron {} archivos", mucta);
     let hicta = extraer_por_hipotesis(&parametros, &ruta)?;
     println!("Los datos por hipótesis de desaparición han sido obtenidos. Se obtuvieron {} archivos", hicta);
     let mecta = extraer_por_medios(&parametros, &ruta)?;
