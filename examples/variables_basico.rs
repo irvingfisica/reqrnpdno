@@ -16,8 +16,8 @@ fn main () {
 
     parametros.id_estatus_victima = "7".to_string();
     parametros.titulo = "PERSONAS DESAPARECIDAS Y NO LOCALIZADAS".to_string();
-    parametros.fecha_inicio = "2018-01-01".to_string();
-    parametros.fecha_fin = "2018-01-01".to_string();
+    parametros.fecha_inicio = "2018-01-20".to_string();
+    parametros.fecha_fin = "2018-01-20".to_string();
 
     // Aquí creamos la estructura de variables a iterar. 
     // Esta estructura es la que se necesita modificar si se necesita iterar por otras variables. 
