@@ -159,7 +159,7 @@ pub fn extraer_todo_iterando(parametros: &Parametros, ruta: &str) -> Result<(), 
     let emcta = extraer_por_estatus_migratorio(&parametros, &ruta)?;
     println!("Los datos por estatus migratorio han sido obtenidos. Se obtuvieron {} archivos", emcta);
     extraer_por_categoria(&parametros, &ruta)?;
-    println!("Los datos generales han sido obtenidos");
+    println!("Los datos por categoría han sido obtenidos");
 
     Ok(())
 }
@@ -201,7 +201,107 @@ pub fn extraer_todo_iterando_municipal(parametros: &Parametros, ruta: &str) -> R
     let emcta = extraer_por_estatus_migratorio(&parametros, &ruta)?;
     println!("Los datos por estatus migratorio han sido obtenidos. Se obtuvieron {} archivos", emcta);
     extraer_por_categoria(&parametros, &ruta)?;
+    println!("Los datos por categoría han sido obtenidos");
+
+    Ok(())
+}
+
+pub struct Iteradora {
+    pub estatus_victima: bool,
+    pub estados: bool,
+    pub municipios: bool,
+    pub hipotesis: bool,
+    pub medios: bool,
+    pub delitos: bool,
+    pub circunstancias: bool,
+    pub discapacidades: bool,
+    pub etnias: bool,
+    pub lenguas: bool,
+    pub religiones: bool,
+    pub emigratorio: bool,
+    pub categorias: bool,
+}
+
+impl Iteradora {
+    pub fn new() -> Self {
+        Iteradora {
+            estatus_victima: true,
+            estados: true,
+            municipios: false,
+            hipotesis: true,
+            medios: false,
+            delitos: false,
+            circunstancias: true,
+            discapacidades: false,
+            etnias: false,
+            lenguas: false,
+            religiones: false,
+            emigratorio: false,
+            categorias: true,
+        }
+    }
+}
+
+pub fn extraer_iterando(parametros: &Parametros, ruta: &str, variables: &Iteradora) -> Result<(), Box<dyn Error>> {
+
+    let mut rutam = ruta.to_string();
+    rutam.push_str("/");
+    rutam.push_str("general.json");
+
+    extraer(&parametros, &rutam)?;
     println!("Los datos generales han sido obtenidos");
+    if variables.estatus_victima {
+        let evcta = extraer_por_estatus_victimas(&parametros, &ruta)?;
+        println!("Los datos por estatus de victima han sido obtenidos. Se obtuvieron {} archivos", evcta);
+    }
+    if variables.estados {
+        let edcta = extraer_por_estados(&parametros, &ruta)?;
+        println!("Los datos por estado han sido obtenidos. Se obtuvieron {} archivos", edcta);
+    }
+    if variables.municipios {
+        let mucta = extraer_por_municipios(&parametros, &ruta)?;
+        println!("Los datos por municipio han sido obtenidos. Se obtuvieron {} archivos", mucta);
+    }
+    if variables.hipotesis {
+        let hicta = extraer_por_hipotesis(&parametros, &ruta)?;
+        println!("Los datos por hipótesis de desaparición han sido obtenidos. Se obtuvieron {} archivos", hicta);
+    }
+    if variables.medios {
+        let mecta = extraer_por_medios(&parametros, &ruta)?;
+        println!("Los datos por medio de conocimiento de la desaparición han sido obtenidos. Se obtuvieron {} archivos", mecta);
+    }
+    if variables.delitos {
+        let decta = extraer_por_delitos(&parametros, &ruta)?;
+        println!("Los datos por delitos han sido obtenidos. Se obtuvieron {} archivos", decta);
+    }
+    if variables.circunstancias {
+        let cicta = extraer_por_circunstancias(&parametros, &ruta)?;
+        println!("Los datos por circunstancias han sido obtenidos. Se obtuvieron {} archivos", cicta);
+    }
+    if variables.discapacidades {
+        let dicta = extraer_por_discapacidades(&parametros, &ruta)?;
+        println!("Los datos por discapapcidad han sido obtenidos. Se obtuvieron {} archivos", dicta);
+    }
+    if variables.etnias {
+        let etcta = extraer_por_etnias(&parametros, &ruta)?;
+        println!("Los datos por etnias han sido obtenidos. Se obtuvieron {} archivos", etcta);
+    }
+    if variables.lenguas {
+        let lecta = extraer_por_lenguas(&parametros, &ruta)?;
+        println!("Los datos por lengua han sido obtenidos. Se obtuvieron {} archivos", lecta);
+    }
+    if variables.religiones {
+        let recta = extraer_por_religiones(&parametros, &ruta)?;
+        println!("Los datos por religión han sido obtenidos. Se obtuvieron {} archivos", recta);
+    }
+    if variables.emigratorio {
+        let emcta = extraer_por_estatus_migratorio(&parametros, &ruta)?;
+        println!("Los datos por estatus migratorio han sido obtenidos. Se obtuvieron {} archivos", emcta);
+    }
+    if variables.categorias {
+        extraer_por_categoria(&parametros, &ruta)?;
+        println!("Los datos por categoría han sido obtenidos");
+    }
 
     Ok(())
 }
@@ -1346,7 +1446,7 @@ impl General {
     pub fn exportar(&self, ruta: &str) -> Result<(), Box<dyn Error>> {
         
         let mut salida = File::create(ruta)?;
-        let j = serde_json::to_string(&self)?;
+        let j = serde_json::to_string_pretty(&self)?;
         write!(salida, "{}", j)?;
 
         Ok(())
