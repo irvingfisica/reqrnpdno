@@ -164,6 +164,50 @@ pub fn extraer_todo_iterando(parametros: &Parametros, ruta: &str) -> Result<(), 
     Ok(())
 }
 
+/// Función de alto nivel para realizar una petición de datos que itera por sobre todos los valores de las variables que se pueden filtrar sin explorar el nivel de colonia. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente. Mucho cuidado con esta función, realiza muchas peticiones pues su objetivo es obtener los datos en los niveles menores de desagregación. Su ejecución tardará muchísimo.
+///
+/// # Argumentos
+///
+/// * `parametros` - Estructura del tipo Parametros que contenga los valores del filtro deseado para las otras variables
+/// * `ruta` - Ruta en donde se pretenden guardar los datos la cual incluya el nombre del archivo, la función creará un archivo JSON de salida llamado nacional.json
+pub fn extraer_todo_iterando_municipal(parametros: &Parametros, ruta: &str) -> Result<(), Box<dyn Error>> {
+
+    let mut rutam = ruta.to_string();
+    rutam.push_str("/");
+    rutam.push_str("general.json");
+
+    extraer(&parametros, &rutam)?;
+    println!("Los datos generales han sido obtenidos");
+    let evcta = extraer_por_estatus_victimas(&parametros, &ruta)?;
+    println!("Los datos por estatus de victima han sido obtenidos. Se obtuvieron {} archivos", evcta);
+    let edcta = extraer_por_estados(&parametros, &ruta)?;
+    println!("Los datos por estado han sido obtenidos. Se obtuvieron {} archivos", edcta);
+    let mucta = extraer_por_municipios(&parametros, &ruta)?;
+    println!("Los datos por municipio han sido obtenidos. Se obtuvieron {} archivos", mucta);
+    let hicta = extraer_por_hipotesis(&parametros, &ruta)?;
+    println!("Los datos por hipótesis de desaparición han sido obtenidos. Se obtuvieron {} archivos", hicta);
+    let mecta = extraer_por_medios(&parametros, &ruta)?;
+    println!("Los datos por medio de conocimiento de la desaparición han sido obtenidos. Se obtuvieron {} archivos", mecta);
+    let decta = extraer_por_delitos(&parametros, &ruta)?;
+    println!("Los datos por delitos han sido obtenidos. Se obtuvieron {} archivos", decta);
+    let cicta = extraer_por_circunstancias(&parametros, &ruta)?;
+    println!("Los datos por circunstancias han sido obtenidos. Se obtuvieron {} archivos", cicta);
+    let dicta = extraer_por_discapacidades(&parametros, &ruta)?;
+    println!("Los datos por discapapcidad han sido obtenidos. Se obtuvieron {} archivos", dicta);
+    let etcta = extraer_por_etnias(&parametros, &ruta)?;
+    println!("Los datos por etnias han sido obtenidos. Se obtuvieron {} archivos", etcta);
+    let lecta = extraer_por_lenguas(&parametros, &ruta)?;
+    println!("Los datos por lengua han sido obtenidos. Se obtuvieron {} archivos", lecta);
+    let recta = extraer_por_religiones(&parametros, &ruta)?;
+    println!("Los datos por religión han sido obtenidos. Se obtuvieron {} archivos", recta);
+    let emcta = extraer_por_estatus_migratorio(&parametros, &ruta)?;
+    println!("Los datos por estatus migratorio han sido obtenidos. Se obtuvieron {} archivos", emcta);
+    extraer_por_categoria(&parametros, &ruta)?;
+    println!("Los datos generales han sido obtenidos");
+
+    Ok(())
+}
+
 /// Función de alto nivel para obtener los datos de desaparecidos iterando sobre los posibles valores de Estatus de víctimas. La función generará un archivo por cada uno de los valores posibles. Es posible filtrar esta petición con otras variables modificando la estructura de parametros que alimenta a la función previamente.  
 ///
 /// # Argumentos
